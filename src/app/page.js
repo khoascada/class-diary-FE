@@ -44,7 +44,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center min-h-screen">
       <h1 className="mb-12 text-5xl font-extrabold text-gray-800 text-center max-w-3xl animate-bounce">
-        🎓 Chào mừng đến với Web Sổ Đầu Bài
+        🎓 Chào mừng đến với Project Test
       </h1>
 
       <p className="mb-12 text-gray-600 text-center max-w-3xl text-lg leading-relaxed">

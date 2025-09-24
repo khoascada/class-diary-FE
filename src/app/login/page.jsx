@@ -26,18 +26,17 @@ export default function Login() {
             Chào mừng đến với
           </h1>
           <h2 className="text-3xl font-semibold text-white ">
-            Phần mềm quản lý trường học
+            Phần mềm Test
           </h2>
           <p className="mt-6 text-white/90 text-lg max-w-lg">
-            Theo dõi sổ đầu bài, quản lý lớp học, và thời khóa biểu một cách
-            trực quan và dễ dàng.
+            Theo dõi You.
           </p>
         </div>
       </div>
 
       <div className="flex-[5] shadow-lg rounded-xl p-8 flex flex-col justify-center items-center ">
         <h1 className="text-3xl font-bold text-center text-primary mb-6 ">
-          Phần mềm quản lý trường học
+          Phần mềm Project Init
         </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-[400px]">
           <div className="flex flex-col">

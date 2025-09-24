@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { ConfigProvider } from "antd";
 import { Provider } from "react-redux";
 import { store } from "@/lib/store";
+import { useSocket } from "@/hooks/useSocket";
 import "@/styles/globals.css";
 
 const geistSans = Geist({
@@ -18,9 +19,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+function SocketWrapper({ children }) {
+  useSocket();
+  return children;
+}
+
 export default function RootLayout({ children }) {
   const pathname = usePathname();
-
   const content =
     pathname === "/login" ? (
       children
@@ -37,7 +42,7 @@ export default function RootLayout({ children }) {
         </main>
 
         <footer className="mt-8 py-4 text-gray-600 text-center text-sm shadow-md w-full flex justify-between px-8">
-          <span>© 2025 Web Sổ Đầu Bài. Tất cả quyền được bảo lưu.</span>
+          <span>Hi i'm your</span>
           <span>Design by: Khoa</span>
         </footer>
       </div>
@@ -58,7 +63,7 @@ export default function RootLayout({ children }) {
               },
             }}
           >
-            {content}
+            <SocketWrapper>{content}</SocketWrapper>
           </ConfigProvider>
         </Provider>
       </body>

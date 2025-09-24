@@ -10,9 +10,9 @@ const AppHeader = () => {
 
   const listMenu = [
     {title: 'Trang chủ', path: "/"},
-    { title: "Lớp học", path: "/class" },
-    { title: "Sổ đầu bài", path: "/class-diary" },
-    { title: "Thời khóa biểu", path: "/timetable" },
+    { title: "A", path: "/A" },
+    { title: "B", path: "/B" },
+    { title: "C", path: "/C" },
   ];
 
   return (
