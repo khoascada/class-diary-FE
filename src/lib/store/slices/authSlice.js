@@ -1,12 +1,16 @@
+// createSlice gộp cả actions và reducers lại làm 1
+// createAsyncThunk dùng để xử lý bất đồng bộ
+
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { apiAxios } from '../../api'
+import { apiAxios } from '@/lib/api'
+
 
 // Async thunks
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await apiAxios.post('/auth/login', credentials)
+      const response = await authSlice.loginUser(credentials)
       const { accessToken, refreshToken, user } = response.data
 
       // Save tokens to storage

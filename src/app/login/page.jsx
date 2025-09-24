@@ -1,14 +1,29 @@
 "use client";
 import React, { useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
+import { loginUser } from "@/lib/store/slices/authSlice";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { loading, error } = useAppSelector((state) => state.auth);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Email:", email, "Password:", password);
-    window.location.href="/"
+
+    const resultAction = await dispatch(loginUser({ email, password }));
+
+    if (loginUser.fulfilled.match(resultAction)) {
+      // ✅ Login success → chuyển sang trang chủ
+      router.push("/");
+    } else {
+      // ❌ Login failed → error đã có trong Redux state
+      console.error("Login failed:", resultAction.payload);
+    }
   };
 
   return (
@@ -25,12 +40,8 @@ export default function Login() {
           <h1 className="text-5xl font-semibold text-white mb-4">
             Chào mừng đến với
           </h1>
-          <h2 className="text-3xl font-semibold text-white ">
-            Phần mềm Test
-          </h2>
-          <p className="mt-6 text-white/90 text-lg max-w-lg">
-            Theo dõi You.
-          </p>
+          <h2 className="text-3xl font-semibold text-white ">Phần mềm Test</h2>
+          <p className="mt-6 text-white/90 text-lg max-w-lg">Theo dõi You.</p>
         </div>
       </div>
 
