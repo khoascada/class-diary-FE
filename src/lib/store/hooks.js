@@ -5,8 +5,4 @@ import { store } from './index'
 export const useAppDispatch = () => useDispatch()
 export const useAppSelector = useSelector
 
-// Nếu muốn hint type cho VSCode bằng JSDoc thì có thể thêm:
-/**
- * @typedef {ReturnType<typeof store.getState>} RootState
- * @typedef {typeof store.dispatch} AppDispatch
- */
+// này chưa cần thiết, khi nào cần log dispatch, thêm prefix, handle errors…

@@ -2,23 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import authSlice from './slices/authSlice'
 import userSlice from './slices/userSlice'
 import uiSlice from './slices/uiSlice'
-
-// Middleware for persisting auth state
-const authPersistMiddleware = (store) => (next) => (action) => {
-  const result = next(action)
-
-  // Save auth state to storage when it changes
-  if (action.type.startsWith('auth/')) {
-    const { isAuthenticated, user } = store.getState().auth
-    if (isAuthenticated && user) {
-      localStorage.setItem('user', JSON.stringify(user))
-    } else {
-      localStorage.removeItem('user')
-    }
-  }
-
-  return result
-}
+import { getDefaultMiddleware } from './middleware'
 
 export const store = configureStore({
   reducer: {
@@ -26,11 +10,18 @@ export const store = configureStore({
     user: userSlice,
     ui: uiSlice,
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
-      },
-    }).concat(authPersistMiddleware),
+  middleware: getDefaultMiddleware,
   devTools: process.env.NODE_ENV !== 'production',
-})
+});
+
+// Initialize auth state from storage on app start
+// chạy cái này để khi reload sẽ lấy user và authen từ local -> store
+const initializeApp = () => {
+  store.dispatch({ type: 'auth/initializeAuth' });
+  store.dispatch({ type: 'user/initializeUIPreferences' });
+};
+
+// Call on app startup
+if (typeof window !== 'undefined') {
+  initializeApp();
+}

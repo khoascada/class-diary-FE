@@ -1,15 +1,16 @@
 "use client";
 import React, { useState } from "react";
-
+import { useDispatch } from "react-redux";
+import { loginUser } from "@/lib/store/slices/authSlice";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Email:", email, "Password:", password);
-    window.location.href="/"
-  };
+  e.preventDefault();
+  dispatch(loginUser({ email, password }));
+};
 
   return (
     <div className="flex  w-full min-h-screen ">
