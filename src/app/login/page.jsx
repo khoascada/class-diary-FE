@@ -26,12 +26,8 @@ export default function Login() {
           <h1 className="text-5xl font-semibold text-white mb-4">
             Chào mừng đến với
           </h1>
-          <h2 className="text-3xl font-semibold text-white ">
-            Phần mềm Test
-          </h2>
-          <p className="mt-6 text-white/90 text-lg max-w-lg">
-            Theo dõi You.
-          </p>
+          <h2 className="text-3xl font-semibold text-white ">Phần mềm Test</h2>
+          <p className="mt-6 text-white/90 text-lg max-w-lg">Theo dõi You.</p>
         </div>
       </div>
 
