@@ -2,48 +2,24 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { apiAxios } from "../../api";
 
 // Async thunks
-// export const loginUser = createAsyncThunk(
-//   'auth/loginUser',
-//   async (credentials, { rejectWithValue }) => {
-//     try {
-//       const response = await apiAxios.post('/auth/login', credentials)
-//       const { accessToken, refreshToken, user } = response.data
+export const loginUser = createAsyncThunk(
+  'auth/loginUser',
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const response = await apiAxios.post('/auth/login', credentials)
+      const { accessToken, refreshToken, user } = response.data
 
-//       // Save tokens to storage
-//       sessionStorage.setItem('accessToken', accessToken)
-//       localStorage.setItem('refreshToken', refreshToken)
+      // Save tokens to storage
+      sessionStorage.setItem('accessToken', accessToken)
+      localStorage.setItem('refreshToken', refreshToken)
 
-//       return { user, accessToken, refreshToken }
-//     } catch (error) {
-//       return rejectWithValue(error.data?.message || 'Login failed')
-//     }
-//   }
-// )
-export const loginUser = createAsyncThunk("auth/loginUser", async (credentials, { rejectWithValue }) => {
-  try {
-    // Fake delay để giả lập call API
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Fake dữ liệu user
-    const fakeUser = {
-      id: 1,
-      name: "Nguyễn Phúc Đăng Khoa",
-      email: credentials.email,
-      role: credentials.email === "admin@example.com" ? "admin" : "user",
-    };
-
-    const fakeAccessToken = "fakeAccessToken123";
-    const fakeRefreshToken = "fakeRefreshToken456";
-
-    // Lưu token vào storage như thật
-    sessionStorage.setItem("accessToken", fakeAccessToken);
-    localStorage.setItem("refreshToken", fakeRefreshToken);
-
-    return { user: fakeUser, accessToken: fakeAccessToken, refreshToken: fakeRefreshToken };
-  } catch (error) {
-    return rejectWithValue("Login failed");
+      return { user, accessToken, refreshToken }
+    } catch (error) {
+      return rejectWithValue(error.data?.message || 'Login failed')
+    }
   }
-});
+)
+
 
 export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
   try {

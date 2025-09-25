@@ -100,7 +100,7 @@ class SocketManager {
 
     // Khi nhận data mới - cái này sẽ update thẳng trên component mà ko qua redux
     this.socket.on("live_update", (data) => {
-
+      console.log('data in socket manager', data)
       this.handleData(data);
 
 

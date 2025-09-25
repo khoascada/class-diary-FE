@@ -19,14 +19,14 @@ authListenerMiddleware.startListening({
     
     console.log('🔑 User logged in:', user.email);
     
-    // Analytics tracking
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'login', {
-        method: 'email',
-        user_id: user.id,
-      });
-    }
-    
+    // // Analytics tracking
+    // if (typeof window !== 'undefined' && window.gtag) {
+    //   window.gtag('event', 'login', {
+    //     method: 'email',
+    //     user_id: user.id,
+    //   });
+    // }
+    console.log("Có chạy vào middleware")
     // Connect socket after login
     if (socketManager && typeof window !== 'undefined') {
       try {

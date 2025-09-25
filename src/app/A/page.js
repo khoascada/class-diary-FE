@@ -9,6 +9,7 @@ export default function Home() {
   useEffect(() => {
     // Đăng ký listener cho live_update
     const cleanup = addEventListener("live_update", (data) => {
+      console.log('socket', data)
       setUpdates((prev) => [...prev, data]);
     });
 

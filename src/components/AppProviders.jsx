@@ -1,0 +1,52 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+import { ConfigProvider } from "antd";
+import { Provider } from "react-redux";
+import { store } from "@/lib/store";
+import AppHeader from "@/components/AppHeader";
+
+export default function AppProviders({ children }) {
+  const pathname = usePathname();
+
+  const content =
+    pathname === "/login" ? (
+      children
+    ) : (
+      <div className="flex flex-col min-h-screen">
+        {/* Header cố định ở trên cùng */}
+        <header className="sticky top-0 z-50">
+          <AppHeader />
+        </header>
+
+        {/* Main content có thể cuộn */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-4 my-4 mx-16 min-h-[calc(100vh-8rem)]">{children}</div>
+        </main>
+
+        {/* Footer */}
+        <footer className="mt-8 py-4 text-gray-600 text-center text-sm shadow-md w-full flex justify-between px-8">
+          <span>Hi im your</span>
+          <span>Design by: Khoa</span>
+        </footer>
+      </div>
+    );
+
+  return (
+    <Provider store={store}>
+      <ConfigProvider
+        theme={{
+          token: {
+            colorPrimary: "#b22222",
+            fontFamily: "Lora, sans-serif",
+            borderRadius: 8,
+            colorTextBase: "#171717",
+            colorBgBase: "#fff",
+          },
+        }}
+      >
+        {content}
+      </ConfigProvider>
+    </Provider>
+  );
+}
