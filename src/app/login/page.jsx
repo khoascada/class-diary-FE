@@ -7,34 +7,39 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
-  e.preventDefault();
-  dispatch(loginUser({ email, password }));
-};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await apiAxios.post("/auth/login", credentials);
+      const { accessToken, refreshToken, user } = response.data;
+
+      // Save tokens to storage
+      sessionStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+
+      return { user, accessToken, refreshToken };
+    } catch (error) {
+      return rejectWithValue(error.data?.message || "Login failed");
+    }
+    // dispatch(loginUser({ email, password }));
+  };
 
   return (
     <div className="flex  w-full min-h-screen ">
-      <div
-        className="flex-[7] relative bg-cover bg-center"
-        style={{ backgroundImage: "url('/images/login.jpg')" }}
-      >
+      <div className="flex-[7] relative bg-cover bg-center" style={{ backgroundImage: "url('/images/login.jpg')" }}>
         {/* Overlay màu nhẹ để chữ nổi bật */}
         <div className="absolute inset-0 bg-black/30"></div>
 
         {/* Text ở giữa */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-8">
-          <h1 className="text-5xl font-semibold text-white mb-4">
-            Chào mừng đến với
-          </h1>
+          <h1 className="text-5xl font-semibold text-white mb-4">Chào mừng đến với</h1>
           <h2 className="text-3xl font-semibold text-white ">Phần mềm Test</h2>
           <p className="mt-6 text-white/90 text-lg max-w-lg">Theo dõi You.</p>
         </div>
       </div>
 
       <div className="flex-[5] shadow-lg rounded-xl p-8 flex flex-col justify-center items-center ">
-        <h1 className="text-3xl font-bold text-center text-primary mb-6 ">
-          Phần mềm Project Init
-        </h1>
+        <h1 className="text-3xl font-bold text-center text-primary mb-6 ">Phần mềm Project Init</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-[400px]">
           <div className="flex flex-col">
             <input

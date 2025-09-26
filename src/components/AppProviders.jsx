@@ -5,7 +5,7 @@ import { ConfigProvider } from "antd";
 import { Provider } from "react-redux";
 import { store } from "@/lib/store";
 import AppHeader from "@/components/AppHeader";
-
+import { AuthProvider } from "@/lib/providers/AuthProvider";
 export default function AppProviders({ children }) {
   const pathname = usePathname();
 
@@ -34,19 +34,21 @@ export default function AppProviders({ children }) {
 
   return (
     <Provider store={store}>
-      <ConfigProvider
-        theme={{
-          token: {
-            colorPrimary: "#b22222",
-            fontFamily: "Lora, sans-serif",
-            borderRadius: 8,
-            colorTextBase: "#171717",
-            colorBgBase: "#fff",
-          },
-        }}
-      >
-        {content}
-      </ConfigProvider>
+      <AuthProvider>
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: "#b22222",
+              fontFamily: "Lora, sans-serif",
+              borderRadius: 8,
+              colorTextBase: "#171717",
+              colorBgBase: "#fff",
+            },
+          }}
+        >
+          {content}
+        </ConfigProvider>
+      </AuthProvider>
     </Provider>
   );
 }

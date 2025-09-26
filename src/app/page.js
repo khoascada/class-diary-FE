@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 
 export default function Home() {
   const user = useSelector(state => state.auth)
-  console.log('user', user)
   const sections = [
     {
       title: "Giới thiệu",

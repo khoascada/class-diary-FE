@@ -17,7 +17,10 @@ class SocketManager {
     if (this.socket?.connected) return this.socket;
 
     const token = sessionStorage.getItem("accessToken"); // Lấy token từ sessionStorage
-
+    if (!token) {
+      console.warn("Không có accessToken, không thể kết nối socket");
+      return null;
+    }
     // Tạo kết nối socket
     this.socket = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
       auth: { token }, // Gửi token kèm theo để server auth
@@ -100,9 +103,8 @@ class SocketManager {
 
     // Khi nhận data mới - cái này sẽ update thẳng trên component mà ko qua redux
     this.socket.on("live_update", (data) => {
-      console.log('data in socket manager', data)
+      console.log("data in socket manager", data);
       this.handleData(data);
-
 
       // phát dữ liệu đến tất cả component đã đăng ký listener "live_update"
       const handlers = this.eventHandlers.get("live_update");
@@ -122,7 +124,7 @@ class SocketManager {
       this.eventHandlers.set(eventName, new Set());
     }
     this.eventHandlers.get(eventName).add(handler);
-    
+
     return () => {
       // Return cleanup function
       this.removeEventListener(eventName, handler);
@@ -138,8 +140,6 @@ class SocketManager {
       }
     }
   }
-
-
 
   // Gửi event tới server
   emit(event, data) {

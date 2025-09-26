@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSocket } from "@/hooks/useSocket";
+
 export default function Home() {
 
   const { addEventListener } = useSocket();
@@ -9,7 +10,6 @@ export default function Home() {
   useEffect(() => {
     // Đăng ký listener cho live_update
     const cleanup = addEventListener("live_update", (data) => {
-      console.log('socket', data)
       setUpdates((prev) => [...prev, data]);
     });
 

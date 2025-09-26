@@ -15,7 +15,6 @@ const AppHeader = () => {
     {title: 'Trang chủ', path: "/"},
     { title: "A", path: "/A" },
     { title: "B", path: "/B" },
-    { title: "C", path: "/C" },
   ];
 
   const handleLogout =  () => {
