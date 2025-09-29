@@ -5,7 +5,7 @@ import { ConfigProvider } from "antd";
 import { App } from "antd";
 import { Provider } from "react-redux";
 import { store } from "@/lib/store";
-import AppHeader from "@/components/AppHeader";
+import AppHeader from "@/components/layouts/AppHeader";
 import { AuthProvider } from "@/lib/providers/AuthProvider";
 import { notificationService } from "@/lib/utils/notificationService";
 
