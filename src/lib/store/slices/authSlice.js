@@ -1,26 +1,27 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { apiAxios } from "../../api";
-
+import axios from "axios";
+import { notificationService } from "@/lib/utils/notificationService";
 // Async thunks
-export const loginUser = createAsyncThunk(
-  'auth/loginUser',
-  async (credentials, { rejectWithValue }) => {
-    try {
-      const response = await apiAxios.post('/auth/login', credentials)
-      const { accessToken, refreshToken, user } = response.data
+export const loginUser = createAsyncThunk("auth/loginUser", async (credentials, { rejectWithValue }) => {
+  try {
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL_API}/auth/login`, credentials);
+    const { accessToken, refreshToken, user } = response.data;
 
-      // Save tokens to storage
-      sessionStorage.setItem('accessToken', accessToken)
-      localStorage.setItem('refreshToken', refreshToken)
+    // Save tokens to storage
+    sessionStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
 
-      return { user, accessToken, refreshToken }
-    } catch (error) {
-      // return rejectWithValue(error.data?.message || 'Login failed')
-      console.log('err', err)
-    }
+    return { user, accessToken, refreshToken };
+    
+  } catch (error) {
+    const errMsg = error.response?.data?.message || "Login failed";
+
+    notificationService.error("Login failed!");
+
+    return rejectWithValue(errMsg);
   }
-)
-
+});
 
 export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
   try {

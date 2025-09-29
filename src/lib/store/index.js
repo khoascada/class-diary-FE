@@ -2,7 +2,6 @@ import { configureStore } from '@reduxjs/toolkit'
 import authSlice from './slices/authSlice'
 import userSlice from './slices/userSlice'
 import uiSlice from './slices/uiSlice'
-import { socketManager } from '../socket'
 import { getDefaultMiddleware } from './middleware'
 
 export const store = configureStore({

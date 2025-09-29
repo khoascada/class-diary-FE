@@ -2,26 +2,16 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { loginUser } from "@/lib/store/slices/authSlice";
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
 
-  const handleSubmit = async (e) => {
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      const response = await apiAxios.post("/auth/login", credentials);
-      const { accessToken, refreshToken, user } = response.data;
-
-      // Save tokens to storage
-      sessionStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-
-      return { user, accessToken, refreshToken };
-    } catch (error) {
-      return rejectWithValue(error.data?.message || "Login failed");
-    }
-    // dispatch(loginUser({ email, password }));
+    dispatch(loginUser({ email, password }));
   };
 
   return (

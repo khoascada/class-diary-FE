@@ -2,7 +2,6 @@ import axios from 'axios'
 import { notification } from "antd";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_API;
-
 // Notification global config
 notification.config({
   placement: "topRight",

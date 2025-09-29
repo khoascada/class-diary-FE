@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "antd";
 import Image from "next/image";
-import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "@/lib/store/slices/authSlice";
 const AppHeader = () => {
@@ -43,7 +42,7 @@ const AppHeader = () => {
                   href={menu.path}
                   className={`
                     px-2 py-1 rounded-md transition-colors
-                    ${isActive ? 'text-texthead font-semibold underline' : ' hover:text-texthead'}
+                    ${isActive ? 'text-texthead font-semibold underline' : 'hover:text-texthead'}
                   `}
                 >
                   {menu.title}

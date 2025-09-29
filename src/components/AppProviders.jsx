@@ -1,11 +1,25 @@
 "use client";
-
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { ConfigProvider } from "antd";
+import { App } from "antd";
 import { Provider } from "react-redux";
 import { store } from "@/lib/store";
 import AppHeader from "@/components/AppHeader";
 import { AuthProvider } from "@/lib/providers/AuthProvider";
+import { notificationService } from "@/lib/utils/notificationService";
+
+// Tạo component con để sử dụng useApp
+function NotificationSetup({ children }) {
+  const { message } = App.useApp();
+
+  useEffect(() => {
+    notificationService.setMessageApi(message);
+  }, [message]);
+
+  return children;
+}
+
 export default function AppProviders({ children }) {
   const pathname = usePathname();
 
@@ -46,7 +60,9 @@ export default function AppProviders({ children }) {
             },
           }}
         >
-          {content}
+          <App component={false}>
+            <NotificationSetup>{content}</NotificationSetup>
+         </App>
         </ConfigProvider>
       </AuthProvider>
     </Provider>
