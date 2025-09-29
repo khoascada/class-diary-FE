@@ -1,22 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useSocket } from "@/hooks/useSocket";
 
 export default function Home() {
-
-  const { addEventListener } = useSocket();
-  const [updates, setUpdates] = useState([]);
-
-  useEffect(() => {
-    // Đăng ký listener cho live_update
-    const cleanup = addEventListener("live_update", (data) => {
-      setUpdates((prev) => [...prev, data]);
-    });
-
-    // Cleanup khi unmount
-    return cleanup;
-  }, [addEventListener]);
-  console.log("update", updates);
   const dummyContent = Array.from({ length: 10 }, (_, i) => (
     <div key={i} className="p-8 my-4 bg-gray-200 rounded-lg shadow-md">
       <h2 className="text-xl font-semibold text-blue-600">Phần tử số {i + 1}</h2>

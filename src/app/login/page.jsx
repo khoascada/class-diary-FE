@@ -4,14 +4,14 @@ import { useDispatch } from "react-redux";
 import { loginUser } from "@/lib/store/slices/authSlice";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(loginUser({ email, password }));
+    dispatch(loginUser({ user_name: user, password }));
   };
 
   return (
@@ -33,11 +33,11 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-[400px]">
           <div className="flex flex-col">
             <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Nhập email"
+              type="user"
+              id="user"
+              value={user}
+              onChange={(e) => setUser(e.target.value)}
+              placeholder="Nhập tài khoản"
               className="border border-gray-300 rounded-sm px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 "
               required
             />

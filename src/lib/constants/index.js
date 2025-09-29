@@ -12,6 +12,12 @@ export const APP_CONFIG = {
   },
 };
 
+export const ROLE = {
+  ADMIN: "Admin",
+  USER: "User",
+  MANAGER: "Manager",
+};
+
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/auth/login',

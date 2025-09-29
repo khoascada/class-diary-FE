@@ -1,7 +1,7 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { loginUser, logoutUser, refreshToken } from "../slices/authSlice";
 import { clearAllData } from "../slices/uiSlice";
-import { socketManager } from "../../socket";
+import { ROLE } from "@/lib/constants";
 
 // Create listener middleware instance
 export const authListenerMiddleware = createListenerMiddleware();
@@ -16,24 +16,6 @@ authListenerMiddleware.startListening({
   effect: async (action, listenerApi) => {
     const { user, accessToken, refreshToken } = action.payload;
 
-    // // Analytics tracking
-    // if (typeof window !== 'undefined' && window.gtag) {
-    //   window.gtag('event', 'login', {
-    //     method: 'email',
-    //     user_id: user.id,
-    //   });
-    // }
-
-    // Connect socket after login
-    if (socketManager && typeof window !== "undefined") {
-      try {
-        socketManager.connect();
-        console.log("🔌 Socket connected after login");
-      } catch (error) {
-        console.error("Failed to connect socket:", error);
-      }
-    }
-
     // Auto-refresh token before expiry (15 minutes before expiry)
     const tokenExpiry = parseJWT(accessToken)?.exp;
     if (tokenExpiry) {
@@ -44,14 +26,14 @@ authListenerMiddleware.startListening({
         }, refreshTime);
       }
     }
-
     // Redirect based on user role or return URL
+    const hasAdminRole = user.department_roles?.some((role) => role.role_name === ROLE.ADMIN);
     const returnUrl = sessionStorage.getItem("returnUrl");
     if (returnUrl) {
       sessionStorage.removeItem("returnUrl");
       window.location.href = returnUrl;
     } else {
-      const defaultRoute = user.role === "admin" ? "/admin" : "/";
+      const defaultRoute = hasAdminRole ? "/admin" : "/";
       window.location.href = defaultRoute;
     }
   },
@@ -62,12 +44,6 @@ authListenerMiddleware.startListening({
   actionCreator: logoutUser.fulfilled,
   effect: async (action, listenerApi) => {
     console.log("👋 User logged out");
-
-    // Disconnect socket
-    if (socketManager) {
-      socketManager.disconnect();
-      console.log("🔌 Socket disconnected after logout");
-    }
 
     // Clear all app data
     listenerApi.dispatch(clearAllData());
@@ -82,12 +58,6 @@ authListenerMiddleware.startListening({
       console.error("Error clearing storage:", error);
     }
 
-    // Analytics
-    if (typeof window !== "undefined" && window.gtag) {
-      window.gtag("event", "logout");
-    }
-
-    // Redirect to login
     setTimeout(() => {
       window.location.href = "/login";
     }, 100);

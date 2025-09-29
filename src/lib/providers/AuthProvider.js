@@ -2,10 +2,9 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { refreshToken, logoutUser } from "../store/slices/authSlice";
-import { socketManager } from "../socket";
 import { store } from "../store";
 import { Spin } from "antd";
-
+import { ROLE } from "../constants";
 const AuthContext = createContext(null);
 
 // Routes that don't require authentication
@@ -23,13 +22,13 @@ const PUBLIC_ROUTES = [
 ];
 
 // Routes that require authentication
-const PROTECTED_ROUTES = ["/dashboard", "/profile", "/settings", "/admin", "/chat"];
+const PROTECTED_ROUTES = [];
 
 // Routes only for unauthenticated users (redirect to dashboard if logged in)
 const GUEST_ONLY_ROUTES = ["/login", "/register", "/forgot-password", "/reset-password"];
 
 // Admin-only routes
-const ADMIN_ROUTES = ["/admin", "/admin/users", "/admin/settings"];
+const ADMIN_ROUTES = ["/admin"];
 
 export const AuthProvider = ({ children }) => {
   const router = useRouter();
@@ -61,9 +60,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Check if user has required permissions
-  const hasPermission = () => {
+  const hasPermissionAdmin = () => {
     if (isAdminRoute()) {
-      return user?.role === "admin" || user?.permissions?.includes("admin");
+      return user?.department_roles?.some((role) => role.role_name === ROLE.ADMIN);
     }
     return true;
   };
@@ -93,31 +92,19 @@ export const AuthProvider = ({ children }) => {
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       const currentState = store.getState().auth;
-      const { isAuthenticated: authState, accessToken: token, refreshToken: refToken } = currentState;
-      if (authState && token && refToken) {
-        // Check if token needs refresh
-        if (isTokenExpired(token)) {
-          console.log("⏰ Token expired, refreshing...");
+      const {  accessToken: token, refreshToken: refToken } = currentState;
 
+      if (refToken) {
+        // Check if token needs refresh
+        if (!token || isTokenExpired(token)) {
           try {
             await dispatch(refreshToken()).unwrap();
             console.log("✅ Token refreshed successfully");
-
-            // Connect socket after successful refresh
-            if (socketManager) {
-              socketManager.connect();
-            }
           } catch (error) {
             console.error("❌ Token refresh failed:", error);
             await dispatch(logoutUser());
             router.push("/login");
             return;
-          }
-        } else {
-          console.log("✅ Token is valid, run socket");
-          // Connect socket if token is valid
-          if (socketManager) {
-            socketManager.connect();
           }
         }
       }
@@ -131,35 +118,34 @@ export const AuthProvider = ({ children }) => {
 
   // Handle route protection - Kiểm tra quyền truy cập route hiện tại
   const handleRouteProtection = async () => {
-  if (isInitializing || !authChecked) return;
+    if (isInitializing || !authChecked) return;
 
-  const currentPath = pathname;
-  console.log(`🛡️ Checking route protection for: ${currentPath}`);
-  // Case 1: Guest-only routes + user is authenticated; nếu user đã login nhưng vào trang login, register,.. -> đá vào trang home
-  if (isGuestOnlyRoute() && isAuthenticated) {
-    console.log("🔄 Authenticated user accessing guest route, redirecting to dashboard");
-    router.replace("/");
-    return;
-  }
+    const currentPath = pathname;
+    console.log(`🛡️ Checking route protection for: ${currentPath}`);
+    // Case 1: Guest-only routes + user is authenticated; nếu user đã login nhưng vào trang login, register,.. -> đá vào trang home
+    if (isGuestOnlyRoute() && isAuthenticated) {
+      console.log("🔄 Authenticated user accessing guest route, redirecting to dashboard");
+      router.replace("/");
+      return;
+    }
 
-  // Case 2: Protected routes + user not authenticated
-  if (isProtectedRoute() && !isAuthenticated) {
-    console.log("🚫 Unauthenticated user accessing protected route, redirecting to login");
-    router.replace("/login");
-    return;
-  }
+    // Case 2: Protected routes + user not authenticated
+    if (isProtectedRoute() && !isAuthenticated) {
+      console.log("🚫 Unauthenticated user accessing protected route, redirecting to login");
+      router.replace("/login");
+      return;
+    }
 
-  // Case 3: Admin routes + user is not admin
-  if (isAdminRoute() && isAuthenticated && !hasPermission()) {
-    console.log("🚫 Non-admin user accessing admin route, redirecting");
-    router.replace("/forbidden");
-    return;
-  }
+    // Case 3: Admin routes + user is not admin
+    if (isAdminRoute() && isAuthenticated && !hasPermissionAdmin()) {
+      console.log("🚫 Non-admin user accessing admin route, redirecting");
+      router.replace("/forbidden");
+      return;
+    }
 
-  // Case 4: All good
-  console.log("✅ Route access granted");
-};
-
+    // Case 4: All good
+    console.log("✅ Route access granted");
+  };
 
   // Initialize on mount
   useEffect(() => {
@@ -193,33 +179,32 @@ export const AuthProvider = ({ children }) => {
   // }, [router.events]);
 
   // Auto logout when token expires - cứ 1p check token
-  
+
   useEffect(() => {
-  if (!isAuthenticated || !accessToken) return;
+    if (!isAuthenticated || !accessToken) return;
 
-  const checkTokenExpiry = async () => {
-    if (isTokenExpired(accessToken)) {
-      console.log("⏰ AccessToken expired, trying to refresh...");
+    const checkTokenExpiry = async () => {
+      if (isTokenExpired(accessToken)) {
+        console.log("⏰ AccessToken expired, trying to refresh...");
 
-      if (refreshToken) {
-        try {
-          await dispatch(refreshToken()).unwrap();
-          console.log("✅ Token refreshed successfully");
-        } catch {
-          console.log("❌ Refresh failed, logging out");
+        if (refreshToken) {
+          try {
+            await dispatch(refreshToken()).unwrap();
+            console.log("✅ Token refreshed successfully");
+          } catch {
+            console.log("❌ Refresh failed, logging out");
+            dispatch(logoutUser());
+          }
+        } else {
           dispatch(logoutUser());
         }
-      } else {
-        dispatch(logoutUser());
       }
-    }
-  };
+    };
 
-  const interval = setInterval(checkTokenExpiry, 60 * 1000);
+    const interval = setInterval(checkTokenExpiry, 60 * 1000);
 
-  return () => clearInterval(interval);
-}, [isAuthenticated, accessToken, refreshToken, dispatch]);
-
+    return () => clearInterval(interval);
+  }, [isAuthenticated, accessToken, refreshToken, dispatch]);
 
   // Context value - Đưa ra cho component con gọi trong useAuth()
   const authContextValue = {
@@ -230,7 +215,7 @@ export const AuthProvider = ({ children }) => {
     login: (credentials) => dispatch(loginUser(credentials)),
     logout: () => dispatch(logoutUser()),
     refreshToken: () => dispatch(refreshToken()),
-    hasPermission,
+    hasPermissionAdmin,
     isPublicRoute,
     isProtectedRoute,
     isAdminRoute,

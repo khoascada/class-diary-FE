@@ -13,7 +13,6 @@ export const loginUser = createAsyncThunk("auth/loginUser", async (credentials, 
     localStorage.setItem("refreshToken", refreshToken);
 
     return { user, accessToken, refreshToken };
-    
   } catch (error) {
     const errMsg = error.response?.data?.message || "Login failed";
 
@@ -25,9 +24,11 @@ export const loginUser = createAsyncThunk("auth/loginUser", async (credentials, 
 
 export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
   try {
-    // await apiAxios.post("/auth/logout");
+    const refreshToken = localStorage.getItem("refreshToken");
+    await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL_API}/auth/logout`, {refresh_token: refreshToken});
   } catch (error) {
-    // Continue logout even if API fails
+    console.error('Error logout:', error)
+    notificationService.error("Logout failed!");
   } finally {
     sessionStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
@@ -41,15 +42,13 @@ export const refreshToken = createAsyncThunk("auth/refreshToken", async (_, { re
     const refreshToken = localStorage.getItem("refreshToken");
     if (!refreshToken) throw new Error("No refresh token");
 
-    const response = await apiAxios.post("/auth/refresh", { refreshToken });
-    const { accessToken, refreshToken: newRefreshToken } = response.data;
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL_API}/auth/refresh`, { refresh_token: refreshToken });
+    const { accessToken } = response.data;
 
     sessionStorage.setItem("accessToken", accessToken);
-    if (newRefreshToken) {
-      localStorage.setItem("refreshToken", newRefreshToken);
-    }
+   
 
-    return { accessToken, refreshToken: newRefreshToken };
+    return { accessToken };
   } catch (error) {
     return rejectWithValue("Token refresh failed");
   }
@@ -75,12 +74,14 @@ const authSlice = createSlice({
       const accessToken = sessionStorage.getItem("accessToken");
       const refreshToken = localStorage.getItem("refreshToken");
       const user = localStorage.getItem("user");
-
-      if (accessToken && refreshToken && user) {
+      
+      if (refreshToken && user) {
         state.isAuthenticated = true;
-        state.accessToken = accessToken;
         state.refreshToken = refreshToken;
         state.user = JSON.parse(user);
+      }
+      if (accessToken) {
+        state.accessToken = accessToken
       }
     },
     updateTokens: (state, action) => {

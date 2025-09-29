@@ -5,7 +5,7 @@ import { ConfigProvider } from "antd";
 import { App } from "antd";
 import { Provider } from "react-redux";
 import { store } from "@/lib/store";
-import AppHeader from "@/components/layouts/AppHeader";
+import AppHeader from "@/components/layouts/header/AppHeader";
 import { AuthProvider } from "@/lib/providers/AuthProvider";
 import { notificationService } from "@/lib/utils/notificationService";
 
@@ -53,7 +53,7 @@ export default function AppProviders({ children }) {
           theme={{
             token: {
               colorPrimary: "#b22222",
-              fontFamily: "Lora, sans-serif",
+              fontFamily: "Inter, sans-serif",
               borderRadius: 8,
               colorTextBase: "#171717",
               colorBgBase: "#fff",

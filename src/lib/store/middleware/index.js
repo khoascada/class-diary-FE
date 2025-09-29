@@ -43,8 +43,8 @@ export const getDefaultMiddleware = (getDefaultMiddleware) => {
   })
     .concat(errorMiddleware) // Handle errors first
     .concat(persistMiddleware) // Then persist state
-    .concat(analyticsMiddleware) // Track actions
-    .concat(cacheMiddleware) // Cache responses
+    // .concat(analyticsMiddleware) // Track actions
+    // .concat(cacheMiddleware) // Cache responses
     .concat(process.env.NODE_ENV === "development" ? loggerMiddleware : [])
     .prepend(authListenerMiddleware.middleware);
 };

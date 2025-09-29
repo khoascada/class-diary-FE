@@ -1,5 +1,8 @@
 "use client";
+import { useSelector } from "react-redux";
 export default function Home() {
+  const user = useSelector(state => state.auth)
+  console.log('user', user)
   const dummyContent = Array.from({ length: 50 }, (_, i) => (
     <div key={i} className="p-8 my-4 bg-gray-200 rounded-lg shadow-md">
       <h2 className="text-xl font-semibold text-blue-600">Phần tử số {i + 1}</h2>
