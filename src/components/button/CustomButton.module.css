@@ -1,0 +1,25 @@
+.button {
+  transition: all 0.3s ease;
+}
+
+/* Solid variant hover */
+.solid:hover {
+  filter: brightness(0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Outline variant hover */
+.outline:hover {
+  background-color: var(--btn-color) !important;
+  color: #ffffff !important;
+}
+
+/* Text variant hover */
+.text:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.button:active {
+  transform: translateY(0);
+}

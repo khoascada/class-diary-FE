@@ -24,7 +24,7 @@ export default function AppProviders({ children }) {
   const pathname = usePathname();
 
   const content =
-    pathname === "/login" ? (
+    pathname === "/login" || pathname === "/admin" ? (
       children
     ) : (
       <div className="flex flex-col min-h-screen">
@@ -35,7 +35,7 @@ export default function AppProviders({ children }) {
 
         {/* Main content có thể cuộn */}
         <main className="flex-1 overflow-y-auto">
-          <div className="p-4 my-4 mx-16 min-h-[calc(100vh-8rem)]">{children}</div>
+          <div className="my-4 mx-16 min-h-[calc(100vh-8rem)]">{children}</div>
         </main>
 
         {/* Footer */}

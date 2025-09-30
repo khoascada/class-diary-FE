@@ -33,7 +33,7 @@ authListenerMiddleware.startListening({
       sessionStorage.removeItem("returnUrl");
       window.location.href = returnUrl;
     } else {
-      const defaultRoute = hasAdminRole ? "/admin" : "/";
+      const defaultRoute = hasAdminRole ? "/admin" : "/home";
       window.location.href = defaultRoute;
     }
   },

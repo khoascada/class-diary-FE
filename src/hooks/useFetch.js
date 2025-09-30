@@ -15,7 +15,7 @@ export const useFetch = (url, options = {}) => {
       try {
         setLoading(true);
         setError(null);
-        
+
         const response = await apiAxios.get(url, fetchOptions);
 
         
@@ -41,9 +41,7 @@ export const useFetch = (url, options = {}) => {
   }, [url, ...dependencies]);
 
   const refetch = () => {
-    setLoading(true);
-    setError(null);
-    // Re-run the effect
+    fetchData();
   };
 
   return { data, loading, error, refetch };

@@ -22,7 +22,7 @@ const PUBLIC_ROUTES = [
 ];
 
 // Routes that require authentication
-const PROTECTED_ROUTES = [];
+const PROTECTED_ROUTES = ["/home"];
 
 // Routes only for unauthenticated users (redirect to dashboard if logged in)
 const GUEST_ONLY_ROUTES = ["/login", "/register", "/forgot-password", "/reset-password"];

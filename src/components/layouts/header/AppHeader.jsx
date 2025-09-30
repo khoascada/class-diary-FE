@@ -10,14 +10,13 @@ const AppHeader = () => {
   const userInfo = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const listMenu = [
-    { title: "Trang chủ", path: "/" },
+    { title: "Trang chủ", path: "/home" },
     { title: "A", path: "/A" },
     { title: "B", path: "/B" },
   ];
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
-  console.log('isUserModalOpen', isUserModalOpen)
   const dropdownRef = useRef(null);
 
   // Function xử lý thông tin user
@@ -45,7 +44,6 @@ const AppHeader = () => {
   return (
     <>
       <header className="flex items-center justify-between h-16 px-6 bg-white shadow-md sticky top-0 z-50">
-        {/* Logo */}
 
         {/* Menu giữa */}
         <nav className="flex-1 flex justify-center items-center">

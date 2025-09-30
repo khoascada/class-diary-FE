@@ -39,6 +39,18 @@ export const formatters = {
     return formatters.formatDate(date);
   },
 
+  formatDateVi: (date) => {
+    if (!date) return "";
+    const d = new Date(date);
+    const dayName = d.toLocaleDateString("vi-VN", { weekday: "long" });
+    const dateString = d.toLocaleDateString("vi-VN", {
+      day: "numeric",
+      month: "numeric",
+      year: "numeric",
+    });
+    return `${dayName}, ${dateString}`;
+  },
+
   // Number formatting
   formatNumber: (number, locale = "en-US") => {
     if (typeof number !== "number") return number;

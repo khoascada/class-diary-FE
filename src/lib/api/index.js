@@ -52,7 +52,7 @@ apiAxios.interceptors.request.use(
 // Response interceptor - Handle common errors with auto refresh
 apiAxios.interceptors.response.use(
   (response) => {
-    return response;
+    return response?.data;
   },
   async (error) => {
     const originalRequest = error.config;
@@ -86,16 +86,13 @@ apiAxios.interceptors.response.use(
       try {
         // Call refresh token API
         const response = await axios.post(`${BASE_URL}/auth/refresh`, {
-          refreshToken: refreshToken
+          refresh_token: refreshToken
         });
 
-        const { accessToken, refreshToken: newRefreshToken } = response.data;
+        const { accessToken } = response.data;
         
         // Save new tokens
         sessionStorage.setItem("accessToken", accessToken);
-        if (newRefreshToken) {
-          localStorage.setItem("refreshToken", newRefreshToken);
-        }
 
         // Update authorization header for original request
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
