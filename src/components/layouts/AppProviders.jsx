@@ -52,7 +52,6 @@ export default function AppProviders({ children }) {
         <ConfigProvider
           theme={{
             token: {
-              colorPrimary: "#b22222",
               fontFamily: "Inter, sans-serif",
               borderRadius: 8,
               colorTextBase: "#171717",

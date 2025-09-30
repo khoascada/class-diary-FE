@@ -1,25 +1,43 @@
 "use client";
 import React, { useMemo, useState } from "react";
-import { ChevronRight, ChevronDown, Edit2, Trash2, Search, Users, Shield, Building2, Save } from "lucide-react";
+import { App } from "antd";
+import {
+  ChevronRight,
+  ChevronDown,
+  Edit2,
+  Trash2,
+  Search,
+  Users,
+  Shield,
+  Building2,
+  Save,
+} from "lucide-react";
 import CustomButton from "@/components/button/CustomButton";
 import { PlusOutlined, SaveOutlined } from "@ant-design/icons";
 import { useFetch } from "@/hooks/useFetch";
+import ModalAddDepartment from "./ModalAddDepartment";
+import departmentService from "@/services/departmentService";
+
 const AdminDashboard = () => {
   // get api
-  const { data: responseDepartments, loading } = useFetch("/department");
+  const { data: responseDepartments, refetch: reFetchDepartments } =
+    useFetch("/department");
 
-  const { listDepartments, totalPage } = useMemo(() => {
-    const { departments = [], totalPage = 1 } = responseDepartments || {};
+  const { listDepartments } = useMemo(() => {
+    const { departments = [] } = responseDepartments || {};
     return { listDepartments: departments };
   }, [responseDepartments]);
   const departments = listDepartments.map((dept) => {
-    const children = listDepartments.filter((depts) => depts.parent_id === dept.id).map((child) => child.id);
+    const children = listDepartments
+      .filter((depts) => depts.parent_id === dept.id)
+      .map((child) => child.id);
     return {
       ...dept,
       children,
     };
   });
-  console.log("list2", departments);
+
+  const { modal, message } = App.useApp();
   const [activeSection, setActiveSection] = useState("organization");
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [selectedRole, setSelectedRole] = useState(null);
@@ -27,6 +45,7 @@ const AdminDashboard = () => {
   const [expandedDepts, setExpandedDepts] = useState({});
   const [searchDept, setSearchDept] = useState("");
   const [searchUser, setSearchUser] = useState("");
+  const [showDeptModal, setShowDeptModal] = useState(false);
 
   // Mock data - Roles
   const [roles] = useState([
@@ -40,17 +59,33 @@ const AdminDashboard = () => {
   // Mock data - System Permissions
   const systemPermissions = [
     { id: "CAN_CREATE_SDB", name: "Tạo Sổ Đầu Bài", category: "Sổ Đầu Bài" },
-    { id: "CAN_EDIT_OWN_SDB", name: "Sửa SĐB Của Mình", category: "Sổ Đầu Bài" },
+    {
+      id: "CAN_EDIT_OWN_SDB",
+      name: "Sửa SĐB Của Mình",
+      category: "Sổ Đầu Bài",
+    },
     { id: "CAN_EDIT_ALL_SDB", name: "Sửa Tất Cả SĐB", category: "Sổ Đầu Bài" },
     { id: "CAN_DELETE_SDB", name: "Xóa Sổ Đầu Bài", category: "Sổ Đầu Bài" },
     { id: "CAN_VIEW_ALL_SDB", name: "Xem Tất Cả SĐB", category: "Sổ Đầu Bài" },
-    { id: "CAN_MANAGE_USERS", name: "Quản Lý Người Dùng", category: "Hệ Thống" },
-    { id: "CAN_MANAGE_DEPARTMENTS", name: "Quản Lý Phòng Ban", category: "Hệ Thống" },
+    {
+      id: "CAN_MANAGE_USERS",
+      name: "Quản Lý Người Dùng",
+      category: "Hệ Thống",
+    },
+    {
+      id: "CAN_MANAGE_DEPARTMENTS",
+      name: "Quản Lý Phòng Ban",
+      category: "Hệ Thống",
+    },
     { id: "CAN_MANAGE_ROLES", name: "Quản Lý Vai Trò", category: "Hệ Thống" },
     { id: "CAN_ASSIGN_PERMISSIONS", name: "Phân Quyền", category: "Hệ Thống" },
     { id: "CAN_VIEW_REPORTS", name: "Xem Báo Cáo", category: "Báo Cáo" },
     { id: "CAN_EXPORT_DATA", name: "Xuất Dữ Liệu", category: "Báo Cáo" },
-    { id: "CAN_APPROVE_SDB", name: "Phê Duyệt Sổ Đầu Bài", category: "Quy Trình" },
+    {
+      id: "CAN_APPROVE_SDB",
+      name: "Phê Duyệt Sổ Đầu Bài",
+      category: "Quy Trình",
+    },
   ];
 
   // Mock data - Role Permissions
@@ -76,26 +111,81 @@ const AdminDashboard = () => {
       "CAN_EXPORT_DATA",
       "CAN_APPROVE_SDB",
     ],
-    3: ["CAN_CREATE_SDB", "CAN_EDIT_OWN_SDB", "CAN_VIEW_ALL_SDB", "CAN_VIEW_REPORTS", "CAN_APPROVE_SDB"],
+    3: [
+      "CAN_CREATE_SDB",
+      "CAN_EDIT_OWN_SDB",
+      "CAN_VIEW_ALL_SDB",
+      "CAN_VIEW_REPORTS",
+      "CAN_APPROVE_SDB",
+    ],
     4: ["CAN_CREATE_SDB", "CAN_EDIT_OWN_SDB", "CAN_VIEW_ALL_SDB"],
     5: ["CAN_CREATE_SDB", "CAN_EDIT_OWN_SDB"],
   });
 
   // Mock data - Users
   const [users] = useState([
-    { id: 1, name: "Nguyễn Văn An", email: "nva@school.edu.vn", department: 1, role: 1 },
-    { id: 2, name: "Trần Thị Bích", email: "ttb@school.edu.vn", department: 2, role: 3 },
-    { id: 3, name: "Lê Văn Cường", email: "lvc@school.edu.vn", department: 2, role: 4 },
-    { id: 4, name: "Phạm Thị Dung", email: "ptd@school.edu.vn", department: 5, role: 5 },
-    { id: 5, name: "Hoàng Văn Em", email: "hve@school.edu.vn", department: 3, role: 4 },
-    { id: 6, name: "Hoàng Văn Em 2", email: "hve@school.edu.vn", department: 9, role: 5 },
-    { id: 7, name: "Hoàng Văn Em 3", email: "hve@school.edu.vn", department: 9, role: 5 },
-    { id: 8, name: "Hoàng Văn Em 4", email: "hve@school.edu.vn", department: 9, role: 5 },
+    {
+      id: 1,
+      name: "Nguyễn Văn An",
+      email: "nva@school.edu.vn",
+      department: 1,
+      role: 1,
+    },
+    {
+      id: 2,
+      name: "Trần Thị Bích",
+      email: "ttb@school.edu.vn",
+      department: 2,
+      role: 3,
+    },
+    {
+      id: 3,
+      name: "Lê Văn Cường",
+      email: "lvc@school.edu.vn",
+      department: 2,
+      role: 4,
+    },
+    {
+      id: 4,
+      name: "Phạm Thị Dung",
+      email: "ptd@school.edu.vn",
+      department: 5,
+      role: 5,
+    },
+    {
+      id: 5,
+      name: "Hoàng Văn Em",
+      email: "hve@school.edu.vn",
+      department: 3,
+      role: 4,
+    },
+    {
+      id: 6,
+      name: "Hoàng Văn Em 2",
+      email: "hve@school.edu.vn",
+      department: 9,
+      role: 5,
+    },
+    {
+      id: 7,
+      name: "Hoàng Văn Em 3",
+      email: "hve@school.edu.vn",
+      department: 9,
+      role: 5,
+    },
+    {
+      id: 8,
+      name: "Hoàng Văn Em 4",
+      email: "hve@school.edu.vn",
+      department: 9,
+      role: 5,
+    },
   ]);
 
   const getDepartmentById = (id) => departments.find((d) => d.id === id);
   const getRoleById = (id) => roles.find((r) => r.id === id);
-  const getUsersByDepartment = (deptId) => users.filter((u) => u.department === deptId);
+  const getUsersByDepartment = (deptId) =>
+    users.filter((u) => u.department === deptId);
 
   const toggleDepartment = (deptId) => {
     setExpandedDepts((prev) => ({
@@ -107,8 +197,38 @@ const AdminDashboard = () => {
   const togglePermission = (roleId, permId) => {
     setRolePermissions((prev) => {
       const current = prev[roleId] || [];
-      const updated = current.includes(permId) ? current.filter((p) => p !== permId) : [...current, permId];
+      const updated = current.includes(permId)
+        ? current.filter((p) => p !== permId)
+        : [...current, permId];
       return { ...prev, [roleId]: updated };
+    });
+  };
+
+  const handleDeleteDepartment = () => {
+    if (!selectedDepartment?.id) return;
+
+    modal.confirm({
+      title: "Xác nhận xóa",
+      content: (
+        <div>
+          Bạn có chắc chắn muốn xóa phòng ban{" "}
+          <strong>{selectedDepartment.name}</strong> không?
+        </div>
+      ),
+      okText: "Xóa",
+      okType: "danger",
+      cancelText: "Hủy",
+      onOk: async () => {
+        try {
+          await departmentService.deleteDepartment(selectedDepartment.id);
+          message.success("Xóa phòng ban thành công");
+          reFetchDepartments();
+          setSelectedDepartment(null);
+        } catch (err) {
+          console.error("Error when delete department", err);
+          message.error("Xóa phòng ban thất bại");
+        }
+      },
     });
   };
 
@@ -136,7 +256,11 @@ const AdminDashboard = () => {
                 toggleDepartment(deptId);
               }}
             >
-              {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+              {isExpanded ? (
+                <ChevronDown size={14} />
+              ) : (
+                <ChevronRight size={14} />
+              )}
             </button>
           )}
           {!hasChildren && <span className="w-4"></span>}
@@ -145,7 +269,9 @@ const AdminDashboard = () => {
         </div>
         {hasChildren &&
           isExpanded &&
-          dept.children.map((childId) => <DepartmentTree key={childId} deptId={childId} level={level + 1} />)}
+          dept.children.map((childId) => (
+            <DepartmentTree key={childId} deptId={childId} level={level + 1} />
+          ))}
       </div>
     );
   };
@@ -156,7 +282,11 @@ const AdminDashboard = () => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-800">Quản Lý Phòng Ban</h2>
           <div className="flex gap-2">
-            <CustomButton color="add" icon={<PlusOutlined />}>
+            <CustomButton
+              color="add"
+              icon={<PlusOutlined />}
+              onClick={() => setShowDeptModal(true)}
+            >
               Tạo Phòng ban
             </CustomButton>
           </div>
@@ -186,14 +316,20 @@ const AdminDashboard = () => {
 
       {/* Department Detail */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Chi Tiết Phòng Ban</h2>
+        <h2 className="text-xl font-bold text-gray-800 mb-4">
+          Chi Tiết Phòng Ban
+        </h2>
 
         {selectedDepartment ? (
           <div className="flex flex-col gap-4">
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">{selectedDepartment.name}</h3>
-                <p className="text-sm text-gray-600 mt-1">{selectedDepartment.description}</p>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {selectedDepartment.name}
+                </h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  {selectedDepartment.description}
+                </p>
                 {selectedDepartment.parent && (
                   <p className="text-xs text-gray-500 mt-2">
                     Thuộc: {getDepartmentById(selectedDepartment.parent)?.name}
@@ -204,17 +340,26 @@ const AdminDashboard = () => {
                 <CustomButton variant="text" color="edit">
                   <Edit2 size={16} />
                 </CustomButton>
-                <CustomButton variant="text" color="delete">
+                <CustomButton
+                  variant="text"
+                  color="delete"
+                  onClick={handleDeleteDepartment}
+                >
                   <Trash2 size={16} />
                 </CustomButton>
               </div>
             </div>
 
             <div>
-              <h4 className="font-semibold text-gray-800 mb-3">Nhân Viên Thuộc Phòng Ban</h4>
+              <h4 className="font-semibold text-gray-800 mb-3">
+                Nhân Viên Thuộc Phòng Ban
+              </h4>
               <div className="border  rounded-lg divide-y max-h-80 overflow-y-auto">
                 {getUsersByDepartment(selectedDepartment.id).map((user) => (
-                  <div key={user.id} className="p-3 flex justify-between items-center hover:bg-gray-50">
+                  <div
+                    key={user.id}
+                    className="p-3 flex justify-between items-center hover:bg-gray-50"
+                  >
                     <div>
                       <p className="font-medium text-sm">{user.name}</p>
                       <p className="text-xs text-gray-500">{user.email}</p>
@@ -225,7 +370,9 @@ const AdminDashboard = () => {
                   </div>
                 ))}
                 {getUsersByDepartment(selectedDepartment.id).length === 0 && (
-                  <div className="p-4 text-center text-gray-500 text-sm">Chưa có nhân viên</div>
+                  <div className="p-4 text-center text-gray-500 text-sm">
+                    Chưa có nhân viên
+                  </div>
                 )}
               </div>
             </div>
@@ -249,7 +396,9 @@ const AdminDashboard = () => {
 
     return (
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Phân quyền cho vai trò</h2>
+        <h2 className="text-xl font-bold text-gray-800 mb-4">
+          Phân quyền cho vai trò
+        </h2>
 
         {/* Role Management */}
         <div className="rounded-lg shadow p-6 mb-6">
@@ -265,15 +414,21 @@ const AdminDashboard = () => {
               <div
                 key={role.id}
                 className={`p-3 cursor-pointer hover:bg-gray-50 ${
-                  selectedRole?.id === role.id ? "bg-blue-50 border-l-4 border-blue-500" : ""
+                  selectedRole?.id === role.id
+                    ? "bg-blue-50 border-l-4 border-blue-500"
+                    : ""
                 }`}
                 onClick={() => setSelectedRole(role)}
               >
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="font-semibold text-sm">{role.name}</p>
-                    <p className="text-xs text-gray-600 mt-1">{role.description}</p>
-                    <p className="text-xs text-gray-500 mt-1">{rolePermissions[role.id]?.length || 0} quyền</p>
+                    <p className="text-xs text-gray-600 mt-1">
+                      {role.description}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {rolePermissions[role.id]?.length || 0} quyền
+                    </p>
                   </div>
                   <div className="flex gap-1">
                     <button className="p-1 text-blue-600 hover:bg-blue-50 rounded">
@@ -291,15 +446,23 @@ const AdminDashboard = () => {
         {selectedRole ? (
           <div>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <p className="text-sm text-gray-600">Đang phân quyền cho vai trò:</p>
-              <p className="text-lg font-semibold text-gray-900">{selectedRole.name}</p>
-              <p className="text-sm text-gray-600 mt-1">{selectedRole.description}</p>
+              <p className="text-sm text-gray-600">
+                Đang phân quyền cho vai trò:
+              </p>
+              <p className="text-lg font-semibold text-gray-900">
+                {selectedRole.name}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                {selectedRole.description}
+              </p>
             </div>
 
             <div className="grid grid-cols-2 gap-6">
               {/* System Permissions List */}
               <div>
-                <h3 className="font-semibold text-gray-800 mb-3">Danh Sách Quyền Hệ Thống</h3>
+                <h3 className="font-semibold text-gray-800 mb-3">
+                  Danh Sách Quyền Hệ Thống
+                </h3>
                 <div className="border rounded-lg p-4 max-h-96 overflow-y-auto">
                   {Object.entries(grouped).map(([category, perms]) => (
                     <div key={category} className="mb-4">
@@ -307,10 +470,15 @@ const AdminDashboard = () => {
                         {category}
                       </h4>
                       {perms.map((perm) => (
-                        <div key={perm.id} className="flex items-center gap-2 py-2 px-2 text-sm text-gray-700">
+                        <div
+                          key={perm.id}
+                          className="flex items-center gap-2 py-2 px-2 text-sm text-gray-700"
+                        >
                           <Shield size={14} className="text-gray-400" />
                           <span>{perm.name}</span>
-                          <span className="text-xs text-gray-400">({perm.id})</span>
+                          <span className="text-xs text-gray-400">
+                            ({perm.id})
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -333,7 +501,9 @@ const AdminDashboard = () => {
                         {category}
                       </h4>
                       {perms.map((perm) => {
-                        const isAssigned = rolePermissions[selectedRole.id]?.includes(perm.id);
+                        const isAssigned = rolePermissions[
+                          selectedRole.id
+                        ]?.includes(perm.id);
                         return (
                           <label
                             key={perm.id}
@@ -342,10 +512,14 @@ const AdminDashboard = () => {
                             <input
                               type="checkbox"
                               checked={isAssigned}
-                              onChange={() => togglePermission(selectedRole.id, perm.id)}
+                              onChange={() =>
+                                togglePermission(selectedRole.id, perm.id)
+                              }
                               className="w-4 h-4"
                             />
-                            <span className="text-sm text-gray-700">{perm.name}</span>
+                            <span className="text-sm text-gray-700">
+                              {perm.name}
+                            </span>
                           </label>
                         );
                       })}
@@ -369,7 +543,9 @@ const AdminDashboard = () => {
     <div className="grid grid-cols-2 gap-6">
       {/* User Selection */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Danh Sách Người Dùng</h2>
+        <h2 className="text-xl font-bold text-gray-800 mb-4">
+          Danh Sách Người Dùng
+        </h2>
 
         <div className="mb-4">
           <div className="relative">
@@ -395,7 +571,9 @@ const AdminDashboard = () => {
               <div
                 key={user.id}
                 className={`p-3 cursor-pointer hover:bg-gray-50 ${
-                  selectedUser?.id === user.id ? "bg-blue-50 border-l-4 border-blue-500" : ""
+                  selectedUser?.id === user.id
+                    ? "bg-blue-50 border-l-4 border-blue-500"
+                    : ""
                 }`}
                 onClick={() => setSelectedUser(user)}
               >
@@ -426,25 +604,37 @@ const AdminDashboard = () => {
           <div>
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
               <p className="text-sm text-gray-600">Người dùng:</p>
-              <p className="text-lg font-semibold text-gray-900">{selectedUser.name}</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {selectedUser.name}
+              </p>
               <p className="text-sm text-gray-600">{selectedUser.email}</p>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Phòng Ban Hiện Tại</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Phòng Ban Hiện Tại
+                </label>
                 <div className="p-3 bg-gray-50 rounded-lg border">
-                  <p className="text-sm font-medium">{getDepartmentById(selectedUser.department)?.name}</p>
-                  <p className="text-xs text-gray-600">{getDepartmentById(selectedUser.department)?.description}</p>
+                  <p className="text-sm font-medium">
+                    {getDepartmentById(selectedUser.department)?.name}
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    {getDepartmentById(selectedUser.department)?.description}
+                  </p>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Vai Trò Chính</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Vai Trò Chính
+                </label>
                 <select
                   className="w-full p-3 border rounded-lg text-sm"
                   value={selectedUser.role} // ✅ React quản lý state
-                  onChange={(e) => setSelectedUser({ ...selectedUser, role: e.target.value })}
+                  onChange={(e) =>
+                    setSelectedUser({ ...selectedUser, role: e.target.value })
+                  }
                 >
                   {roles.map((role) => (
                     <option key={role.id} value={role.id}>
@@ -462,12 +652,17 @@ const AdminDashboard = () => {
 
               {/* Show assigned permissions preview */}
               <div className="mt-6 pt-6 border-t">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Quyền Của Vai Trò Này:</h3>
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">
+                  Quyền Của Vai Trò Này:
+                </h3>
                 <div className="bg-gray-50 rounded-lg p-3 max-h-48 overflow-y-auto">
                   {rolePermissions[selectedUser.role]?.map((permId) => {
                     const perm = systemPermissions.find((p) => p.id === permId);
                     return (
-                      <div key={permId} className="flex items-center gap-2 py-1 text-xs text-gray-700">
+                      <div
+                        key={permId}
+                        className="flex items-center gap-2 py-1 text-xs text-gray-700"
+                      >
                         <Shield size={12} className="text-green-600" />
                         <span>{perm?.name}</span>
                       </div>
@@ -487,6 +682,8 @@ const AdminDashboard = () => {
     </div>
   );
 
+  // Modal
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -499,7 +696,9 @@ const AdminDashboard = () => {
         <nav className="flex-1 p-4 space-y-2">
           <button
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left ${
-              activeSection === "organization" ? "bg-blue-600" : "hover:bg-gray-800"
+              activeSection === "organization"
+                ? "bg-blue-600"
+                : "hover:bg-gray-800"
             }`}
             onClick={() => setActiveSection("organization")}
           >
@@ -508,7 +707,9 @@ const AdminDashboard = () => {
           </button>
           <button
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left ${
-              activeSection === "permissions" ? "bg-blue-600" : "hover:bg-gray-800"
+              activeSection === "permissions"
+                ? "bg-blue-600"
+                : "hover:bg-gray-800"
             }`}
             onClick={() => setActiveSection("permissions")}
           >
@@ -535,6 +736,13 @@ const AdminDashboard = () => {
           {activeSection === "users" && renderUserRoleAssignment()}
         </div>
       </div>
+
+      <ModalAddDepartment
+        visible={showDeptModal}
+        departments={departments}
+        setVisible={setShowDeptModal}
+        fetchDepartment={reFetchDepartments}
+      />
     </div>
   );
 };

@@ -1,13 +1,8 @@
-import axios from 'axios'
-import { notification } from "antd";
+import axios from "axios";
+import { notificationService } from "../utils/notificationService";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_API;
-// Notification global config
-notification.config({
-  placement: "topRight",
-  top: 64,
-  duration: 3,
-});
+
 
 // Create axios instance
 export const apiAxios = axios.create({
@@ -24,14 +19,14 @@ let failedQueue = []; // danh sách request đang chờ refresh
 
 // retry lại các request đang chờ
 const processQueue = (error, token = null) => {
-  failedQueue.forEach(prom => {
+  failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
     } else {
       prom.resolve(token);
     }
   });
-  
+
   failedQueue = [];
 };
 
@@ -57,26 +52,28 @@ apiAxios.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     const { status, data } = error.response || {};
-    
+
     // Handle 401 - Token expired
     if (status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         // If already refreshing, queue this request
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then(token => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return apiAxios(originalRequest);
-        }).catch(err => {
-          return Promise.reject(err);
-        });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return apiAxios(originalRequest);
+          })
+          .catch((err) => {
+            return Promise.reject(err);
+          });
       }
 
       originalRequest._retry = true;
       isRefreshing = true;
 
       const refreshToken = localStorage.getItem("refreshToken");
-      
+
       if (!refreshToken) {
         // No refresh token, logout immediately
         handleLogout();
@@ -86,33 +83,31 @@ apiAxios.interceptors.response.use(
       try {
         // Call refresh token API
         const response = await axios.post(`${BASE_URL}/auth/refresh`, {
-          refresh_token: refreshToken
+          refresh_token: refreshToken,
         });
 
         const { accessToken } = response.data;
-        
+
         // Save new tokens
         sessionStorage.setItem("accessToken", accessToken);
 
         // Update authorization header for original request
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        
+
         // Process queued requests
         processQueue(null, accessToken);
-        
+
         // Retry original request
         return apiAxios(originalRequest);
-        
       } catch (refreshError) {
         // Refresh token expired or invalid
         processQueue(refreshError, null);
         handleLogout();
-        
-        notification.error({
-          message: "Session Expired",
-          description: "Your session has expired. Please login again.",
-        });
-        
+
+        notificationService.error(
+          "Your session has expired. Please login again."
+        );
+
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -120,44 +115,42 @@ apiAxios.interceptors.response.use(
     }
 
     // Handle other error status codes
-    switch (status) {      
+    switch (status) {
       case 403:
-        notification.error({
-          message: "Access Denied",
-          description: "You don't have permission to perform this action.",
-        });
+        notificationService.error(
+          "Access Denied.You don't have permission to perform this action."
+        );
         break;
-        
+
       case 404:
-        notification.error({
-          message: "Resource Not Found",
-          description: data?.message || "The requested resource was not found.",
-        });
+        notificationService.error(
+          "Resource Not Found.The requested resource was not found."
+        );
         break;
-        
+
       case 422:
-        notification.error({
-          message: "Validation Error",
-          description: data?.message || "Please check your input data.",
+        notificationService.error({
+          message: "",
+          description:
+            data?.message || "Validation Error.Please check your input data.",
         });
         break;
-        
+
       case 500:
-        notification.error({
-          message: "Server Error",
-          description: "Something went wrong on our end. Please try again later.",
-        });
+        notificationService.error(
+          "Server Error.Something went wrong on our end. Please try again later."
+        );
         break;
-        
+
       default:
-        if (status !== 401) { // Don't show error for 401 as it's handled above
-          notification.error({
-            message: "Error",
-            description: data?.message || "An unexpected error occurred.",
-          });
+        if (status !== 401) {
+          // Don't show error for 401 as it's handled above
+          "Server Error.Something went wrong on our end. Please try again later.".error(
+            "An unexpected error occurred."
+          );
         }
     }
-    
+
     return Promise.reject(error.response);
   }
 );
@@ -168,12 +161,12 @@ const handleLogout = () => {
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("user"); // Clear user data if stored
   // Redirect to login page
-  window.location.href = '/login';
+  window.location.href = "/login";
 };
 
 // Helper functions for common API patterns
 export const handleApiError = (error) => {
-  console.error('API Error:', error);
+  console.error("API Error:", error);
   return error;
 };
 
@@ -184,7 +177,7 @@ export const createAuthHeaders = (token) => ({
 // Helper for multipart/form-data requests (file uploads)
 export const createMultipartConfig = (token) => ({
   headers: {
-    'Content-Type': 'multipart/form-data',
+    "Content-Type": "multipart/form-data",
     ...(token && { Authorization: `Bearer ${token}` }),
   },
 });
@@ -192,18 +185,18 @@ export const createMultipartConfig = (token) => ({
 // Manual token refresh function (optional)
 export const refreshTokenManually = async () => {
   const refreshToken = localStorage.getItem("refreshToken");
-  
+
   if (!refreshToken) {
     throw new Error("No refresh token available");
   }
 
   try {
     const response = await axios.post(`${BASE_URL}/auth/refresh`, {
-      refreshToken: refreshToken
+      refreshToken: refreshToken,
     });
 
     const { accessToken, refreshToken: newRefreshToken } = response.data;
-    
+
     sessionStorage.setItem("accessToken", accessToken);
     if (newRefreshToken) {
       localStorage.setItem("refreshToken", newRefreshToken);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { apiAxios } from '@/lib/api/index';
 
 export const useFetch = (url, options = {}) => {
@@ -8,40 +8,47 @@ export const useFetch = (url, options = {}) => {
 
   const { dependencies = [], ...fetchOptions } = options;
 
-  useEffect(() => {
-    let cancelled = false;
+  // useCallback để dùng cho refetch
+  const fetchData = useCallback(async (cancelledRef) => {
+    try {
+      setLoading(true);
+      setError(null);
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+      const response = await apiAxios.get(url, fetchOptions);
 
-        const response = await apiAxios.get(url, fetchOptions);
-
-        
-        if (!cancelled) {
-          setData(response);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(err);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+      if (!cancelledRef.current) {
+        setData(response);
       }
-    };
+    } catch (err) {
+      if (!cancelledRef.current) {
+        setError(err);
+      }
+    } finally {
+      if (!cancelledRef.current) {
+        setLoading(false);
+      }
+    }
+  }, [url, JSON.stringify(fetchOptions)]);
 
-    fetchData();
+  const cancelledRef = { current: false };
+
+  useEffect(() => {
+    cancelledRef.current = false;
+
+    async function load() {
+      await fetchData(cancelledRef);
+    }
+
+    load();
 
     return () => {
-      cancelled = true;
+      cancelledRef.current = true; // cleanup khi unmount
     };
-  }, [url, ...dependencies]);
+  }, [fetchData, ...dependencies]);
 
   const refetch = () => {
-    fetchData();
+    cancelledRef.current = false;
+    fetchData(cancelledRef);
   };
 
   return { data, loading, error, refetch };
