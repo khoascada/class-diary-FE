@@ -1,23 +1,26 @@
-import { useState, useEffect, useCallback } from 'react';
-import { apiAxios } from '@/lib/api/index';
+// hooks/useFetchService.ts
+import { useState, useEffect, useCallback, useRef } from 'react';
 
-export const useFetch = (url, options = {}) => {
+export const useFetchService = (serviceFn, deps = []) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const cancelledRef = useRef(false);
+  
+  // Thêm useRef để lưu serviceFn
+  const serviceFnRef = useRef(serviceFn);
+  
+  useEffect(() => {
+    serviceFnRef.current = serviceFn;
+  }, [serviceFn]);
 
-  const { dependencies = [], ...fetchOptions } = options;
-
-  // useCallback để dùng cho refetch
-  const fetchData = useCallback(async (cancelledRef) => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-
-      const response = await apiAxios.get(url, fetchOptions);
-
+      const result = await serviceFnRef.current(); // Dùng ref
       if (!cancelledRef.current) {
-        setData(response);
+        setData(result);
       }
     } catch (err) {
       if (!cancelledRef.current) {
@@ -25,31 +28,24 @@ export const useFetch = (url, options = {}) => {
       }
     } finally {
       if (!cancelledRef.current) {
-        setLoading(false);
+        setLoading(false); 
       }
     }
-  }, [url, JSON.stringify(fetchOptions)]);
-
-  const cancelledRef = { current: false };
+  }, []); // Bỏ serviceFn khỏi deps
 
   useEffect(() => {
     cancelledRef.current = false;
-
-    async function load() {
-      await fetchData(cancelledRef);
-    }
-
-    load();
-
+    fetchData();
+    
     return () => {
-      cancelledRef.current = true; // cleanup khi unmount
+      cancelledRef.current = true;
     };
-  }, [fetchData, ...dependencies]);
+  }, [...deps]); // Chỉ re-fetch khi deps thay đổi
 
-  const refetch = () => {
+  const refetch = useCallback(() => {
     cancelledRef.current = false;
-    fetchData(cancelledRef);
-  };
+    fetchData();
+  }, [fetchData]);
 
   return { data, loading, error, refetch };
 };

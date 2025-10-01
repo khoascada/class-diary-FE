@@ -3,7 +3,6 @@ import { notificationService } from "../utils/notificationService";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_API;
 
-
 // Create axios instance
 export const apiAxios = axios.create({
   baseURL: BASE_URL,
@@ -47,7 +46,7 @@ apiAxios.interceptors.request.use(
 // Response interceptor - Handle common errors with auto refresh
 apiAxios.interceptors.response.use(
   (response) => {
-    return response?.data;
+    return response;
   },
   async (error) => {
     const originalRequest = error.config;
@@ -104,51 +103,12 @@ apiAxios.interceptors.response.use(
         processQueue(refreshError, null);
         handleLogout();
 
-        notificationService.error(
-          "Your session has expired. Please login again."
-        );
+        notificationService.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
 
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
       }
-    }
-
-    // Handle other error status codes
-    switch (status) {
-      case 403:
-        notificationService.error(
-          "Access Denied.You don't have permission to perform this action."
-        );
-        break;
-
-      case 404:
-        notificationService.error(
-          "Resource Not Found.The requested resource was not found."
-        );
-        break;
-
-      case 422:
-        notificationService.error({
-          message: "",
-          description:
-            data?.message || "Validation Error.Please check your input data.",
-        });
-        break;
-
-      case 500:
-        notificationService.error(
-          "Server Error.Something went wrong on our end. Please try again later."
-        );
-        break;
-
-      default:
-        if (status !== 401) {
-          // Don't show error for 401 as it's handled above
-          "Server Error.Something went wrong on our end. Please try again later.".error(
-            "An unexpected error occurred."
-          );
-        }
     }
 
     return Promise.reject(error.response);

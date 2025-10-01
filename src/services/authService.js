@@ -56,4 +56,5 @@ class AuthService extends BaseService {
   }
 }
 
-export default new AuthService();
+const authService = new AuthService()
+export default authService;

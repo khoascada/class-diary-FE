@@ -1,7 +1,7 @@
 import { apiAxios } from "@/lib/api";
 
 class BaseService {
-  constructor(baseURL = '') {
+  constructor(baseURL = "") {
     this.baseURL = baseURL; // như này thì tùy biến prefix cho từng service con
     this.api = apiAxios;
   }
@@ -54,40 +54,35 @@ class BaseService {
 
   // Response handler - customize based on API structure
   handleResponse(response) {
-    // If API returns data in response.data.data
-    if (response.data && response.data.data !== undefined) {
-      return {
-        data: response.data.data,
-        message: response.data.message,
-        success: response.data.success || true,
-        meta: response.data.meta || null,
-      };
-    }
-    
-    // If API returns data directly in response.data
-    return {
-      data: response.data,
-      success: true,
-      message: 'Success',
-    };
+    return response.data?.data !== undefined ? response.data.data : response.data;
   }
 
   // Error handler
   handleError(error) {
-    const errorData = {
-      message: error.response?.data?.message || error.message || 'An error occurred',
-      status: error.response?.status || 500,
-      data: error.response?.data || null,
+    const { status, data } = error || {};
+
+    throw {
+      status,
+      message: data?.message || this.getDefaultMessage(status),
+      originalError: error,
     };
-    
-    return errorData;
+  }
+  getDefaultMessage(status) {
+    const defaults = {
+      400: "Dữ liệu không hợp lệ",
+      403: "Bạn không có quyền thực hiện",
+      404: "Không tìm thấy dữ liệu",
+      422: "Dữ liệu không hợp lệ",
+      500: "Lỗi server",
+    };
+    return defaults[status] || "Đã có lỗi xảy ra";
   }
 
   // Utility method for query parameters
   buildQuery(params) {
     const query = new URLSearchParams();
-    Object.keys(params).forEach(key => {
-      if (params[key] !== null && params[key] !== undefined && params[key] !== '') {
+    Object.keys(params).forEach((key) => {
+      if (params[key] !== null && params[key] !== undefined && params[key] !== "") {
         query.append(key, params[key]);
       }
     });

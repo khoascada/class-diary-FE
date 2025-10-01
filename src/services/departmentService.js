@@ -1,16 +1,22 @@
 import BaseService from "./base/BaseService";
 
 class DepartmentService extends BaseService {
-    constructor() {
-        super('/department');
-    }
+  constructor() {
+    super("/department");
+  }
 
-    async createDepartment(data)  {
-        return this.post('/', data);
-    }
-    async deleteDepartment(idDepartment) {
-        return this.delete(`/${idDepartment}`)
-    }
+  // Arrow functions để giữ this
+  getListDepartment = async () => this.get("/");
+
+  createDepartment = async (data) => this.post("/", data);
+
+  deleteDepartment = async (idDepartment) => this.delete(`/${idDepartment}`);
+
+  updateDepartment = async (idDepartment, data) => this.patch(`/${idDepartment}`, data);
+
+  getListDepartmentForUpdate = async (idDepartment) =>
+    this.get(`/${idDepartment}/department-for-update`);
 }
 
-export default new DepartmentService()
+const departmentService = new DepartmentService();
+export default departmentService;
