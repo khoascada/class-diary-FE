@@ -1,33 +1,32 @@
-
-import { Modal, Input, Select, Form } from "antd";
-import DepartmentService from "@/services/departmentService";
-import { notificationService } from "@/lib/utils/notificationService";
+import { Modal, Input, Select, Form } from 'antd';
+import DepartmentService from '@/services/departmentService';
+import { notificationService } from '@/lib/utils/notificationService';
 const { TextArea } = Input;
 const ModalAddDepartment = ({ visible, departments, setVisible, fetchDepartment }) => {
   const [form] = Form.useForm();
   const handleCancelDepartment = () => {
     form.resetFields();
-    setVisible(false)
+    setVisible(false);
   };
   const handleSubmit = async () => {
-  try {
-    const values = await form.validateFields();
+    try {
+      const values = await form.validateFields();
 
-    // Lọc bỏ những field undefined/null
-    const filteredValues = Object.fromEntries(
-      Object.entries(values).filter(([_, v]) => v != null)
-    );
-    await DepartmentService.createDepartment(filteredValues)
-    form.resetFields();
-    fetchDepartment()
-    setVisible(false)
-    notificationService.success("Tạo thành công!")
-    // Gọi API với filteredValues
-  } catch (errorInfo) {
-    console.log('Validate Failed:', errorInfo);
-    notificationService.error("Có lỗi khi tạo phòng ban. Vui lòng tạo lại!")
-  }
-};
+      // Lọc bỏ những field undefined/null
+      const filteredValues = Object.fromEntries(
+        Object.entries(values).filter(([_, v]) => v != null)
+      );
+      await DepartmentService.createDepartment(filteredValues);
+      form.resetFields();
+      fetchDepartment();
+      setVisible(false);
+      notificationService.success('Tạo thành công!');
+      // Gọi API với filteredValues
+    } catch (errorInfo) {
+      console.log('Validate Failed:', errorInfo);
+      notificationService.error('Có lỗi khi tạo phòng ban. Vui lòng tạo lại!');
+    }
+  };
 
   return (
     <Modal
@@ -43,7 +42,7 @@ const ModalAddDepartment = ({ visible, departments, setVisible, fetchDepartment 
         <Form.Item
           label="Tên Phòng Ban"
           name="name"
-          rules={[{ required: true, message: "Vui lòng nhập tên phòng ban" }]}
+          rules={[{ required: true, message: 'Vui lòng nhập tên phòng ban' }]}
         >
           <Input placeholder="Ví dụ: Khối Toán - Lý" />
         </Form.Item>
@@ -51,7 +50,7 @@ const ModalAddDepartment = ({ visible, departments, setVisible, fetchDepartment 
         <Form.Item
           label="Mã Phòng Ban"
           name="code"
-          rules={[{ required: true, message: "Vui lòng nhập mã phòng ban" }]}
+          rules={[{ required: true, message: 'Vui lòng nhập mã phòng ban' }]}
         >
           <Input placeholder="Ví dụ: MATH_PHYS" />
         </Form.Item>

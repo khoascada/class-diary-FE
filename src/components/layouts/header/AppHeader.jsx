@@ -1,20 +1,26 @@
-"use client";
-import React, { useState, useRef, useEffect } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "@/lib/store/slices/authSlice";
-import UserInfoModal from "./UserInfoModal";
+'use client';
+import React, { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import { logoutUser } from '@/lib/store/slices/authSlice';
+import UserInfoModal from './UserInfoModal';
+import { useAuth } from '@/lib/providers/AuthProvider';
 const AppHeader = () => {
   const pathname = usePathname();
+  const {isAdminRoute} = useAuth()
   const userInfo = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const listMenu = [
-    { title: "Trang chủ", path: "/home" },
-    { title: "A", path: "/A" },
-    { title: "B", path: "/B" },
+    { title: 'Trang chủ', path: '/home' },
+    { title: 'A', path: '/A' },
+    { title: 'B', path: '/B' },
   ];
-
+  const adminMenu = [
+  { title: 'Phòng ban', path: '/admin/departments' },
+  { title: 'Vai trò', path: '/admin/roles' },
+  { title: 'Người dùng', path: '/admin/users' },
+];
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -33,9 +39,9 @@ const AppHeader = () => {
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
   const handleLogout = () => {
@@ -43,21 +49,19 @@ const AppHeader = () => {
   };
   return (
     <>
-      <header className="flex items-center justify-between h-16 px-6 bg-white shadow-md sticky top-0 z-50">
-
+      <header className="sticky top-0 z-50 flex h-16 items-center justify-between bg-white px-6 shadow-md">
         {/* Menu giữa */}
-        <nav className="flex-1 flex justify-center items-center">
+        <nav className="flex flex-1 items-center justify-center">
           <ul className="flex gap-8">
-            {listMenu.map((menu) => {
+            {
+            
+            (isAdminRoute ? adminMenu : listMenu).map((menu) => {
               const isActive = pathname === menu.path;
               return (
                 <li key={menu.path}>
                   <Link
                     href={menu.path}
-                    className={`
-                px-2 py-1 rounded-md transition-colors
-                ${isActive ? "text-texthead font-semibold underline" : "hover:text-texthead"}
-              `}
+                    className={`rounded-md px-2 py-1 transition-colors ${isActive ? 'text-texthead font-semibold underline' : 'hover:text-texthead'} `}
                   >
                     {menu.title}
                   </Link>
@@ -70,38 +74,45 @@ const AppHeader = () => {
         {/* User Avatar Dropdown */}
         <div className="relative" ref={dropdownRef}>
           <div
-            className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors"
+            className="flex cursor-pointer items-center gap-3 rounded-lg p-2 transition-colors hover:bg-gray-50"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
             {/* Tên user */}
-            <span className="text-sm font-medium text-gray-700 hidden sm:block">{userInfo?.user_name}</span>
+            <span className="hidden text-sm font-medium text-gray-700 sm:block">
+              {userInfo?.user_name}
+            </span>
 
             {/* Avatar */}
             <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-md">
-                <span className="text-white font-semibold text-sm">JD</span>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 shadow-md">
+                <span className="text-sm font-semibold text-white">JD</span>
               </div>
-              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 border-2 border-white rounded-full"></div>
+              <div className="absolute -right-1 -bottom-1 h-3 w-3 rounded-full border-2 border-white bg-green-400"></div>
             </div>
 
             {/* Dropdown arrow */}
             <svg
-              className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
-                isDropdownOpen ? "rotate-180" : ""
+              className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${
+                isDropdownOpen ? 'rotate-180' : ''
               }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </div>
 
           {/* Dropdown Menu */}
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50">
+            <div className="absolute right-0 z-50 mt-2 w-56 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
               {/* User Info Section */}
-              <div className="px-4 py-3 border-b border-gray-100">
+              <div className="border-b border-gray-100 px-4 py-3">
                 <p className="text-sm font-medium text-gray-900">{userInfo?.user_name}</p>
                 <p className="text-sm text-gray-500">khoa.nguyen@gmail.com</p>
               </div>
@@ -109,10 +120,10 @@ const AppHeader = () => {
               {/* Menu Items */}
               <div className="py-1">
                 <button
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:!bg-gray-100 flex items-center gap-3 transition-colors cursor-pointer"
+                  className="flex w-full cursor-pointer items-center gap-3 px-4 py-2 text-left text-sm text-gray-700 transition-colors hover:!bg-gray-100"
                   onClick={handleUserInfo}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -126,10 +137,10 @@ const AppHeader = () => {
                 <hr className="my-1 border-gray-100" />
 
                 <button
-                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors cursor-pointer"
+                  className="flex w-full cursor-pointer items-center gap-3 px-4 py-2 text-left text-sm text-red-600 transition-colors hover:bg-red-50"
                   onClick={handleLogout}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -137,7 +148,7 @@ const AppHeader = () => {
                       d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                     />
                   </svg>
-                  Đăng xuất
+                  Đăng xuất
                 </button>
               </div>
             </div>

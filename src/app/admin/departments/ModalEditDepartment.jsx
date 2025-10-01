@@ -1,9 +1,9 @@
-import { useEffect } from "react";
-import { Modal, Input, Select, Form } from "antd";
-import DepartmentService from "@/services/departmentService";
-import { notificationService } from "@/lib/utils/notificationService";
-import { useFetchService } from "@/hooks/useFetch";
-import departmentService from "@/services/departmentService";
+import { useEffect } from 'react';
+import { Modal, Input, Select, Form } from 'antd';
+import DepartmentService from '@/services/departmentService';
+import { notificationService } from '@/lib/utils/notificationService';
+import { useFetchService } from '@/hooks/useFetch';
+import departmentService from '@/services/departmentService';
 const { TextArea } = Input;
 const ModalEditDepartment = ({ visible, departmentInit, setVisible, fetchDepartment }) => {
   const { data: listDepartmentForParent, loading } = useFetchService(
@@ -21,25 +21,27 @@ const ModalEditDepartment = ({ visible, departmentInit, setVisible, fetchDepartm
       const values = await form.validateFields();
 
       // Lọc bỏ những field undefined/null
-      const filteredValues = Object.fromEntries(Object.entries(values).filter(([_, v]) => v != null));
+      const filteredValues = Object.fromEntries(
+        Object.entries(values).filter(([_, v]) => v != null)
+      );
       await DepartmentService.updateDepartment(departmentInit?.id, filteredValues);
       form.resetFields();
       fetchDepartment();
       setVisible(false);
-      notificationService.success("Tạo thành công!");
+      notificationService.success('Tạo thành công!');
       // Gọi API với filteredValues
     } catch (errorInfo) {
-      console.log("Validate Failed:", errorInfo);
-      notificationService.error("Có lỗi khi tạo phòng ban. Vui lòng tạo lại!");
+      console.log('Validate Failed:', errorInfo);
+      notificationService.error('Có lỗi khi tạo phòng ban. Vui lòng tạo lại!');
     }
   };
 
   useEffect(() => {
     if (visible && departmentInit) {
       form.setFieldsValue({
-        name: departmentInit.name || "",
-        code: departmentInit.code || "",
-        description: departmentInit.description || "",
+        name: departmentInit.name || '',
+        code: departmentInit.code || '',
+        description: departmentInit.description || '',
         parent_id: departmentInit.parent_id || null,
       });
     } else if (!visible) {
@@ -61,12 +63,16 @@ const ModalEditDepartment = ({ visible, departmentInit, setVisible, fetchDepartm
         <Form.Item
           label="Tên Phòng Ban"
           name="name"
-          rules={[{ required: true, message: "Vui lòng nhập tên phòng ban" }]}
+          rules={[{ required: true, message: 'Vui lòng nhập tên phòng ban' }]}
         >
           <Input placeholder="Ví dụ: Khối Toán - Lý" />
         </Form.Item>
 
-        <Form.Item label="Mã Phòng Ban" name="code" rules={[{ required: true, message: "Vui lòng nhập mã phòng ban" }]}>
+        <Form.Item
+          label="Mã Phòng Ban"
+          name="code"
+          rules={[{ required: true, message: 'Vui lòng nhập mã phòng ban' }]}
+        >
           <Input placeholder="Ví dụ: MATH_PHYS" />
         </Form.Item>
 

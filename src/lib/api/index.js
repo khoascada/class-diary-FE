@@ -1,5 +1,5 @@
-import axios from "axios";
-import { notificationService } from "../utils/notificationService";
+import axios from 'axios';
+import { notificationService } from '../utils/notificationService';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_API;
 
@@ -7,7 +7,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL_API;
 export const apiAxios = axios.create({
   baseURL: BASE_URL,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
   timeout: 10000, // 10s timeout
 });
@@ -32,7 +32,7 @@ const processQueue = (error, token = null) => {
 // Request interceptor - Add auth token dynamically
 apiAxios.interceptors.request.use(
   (config) => {
-    const token = sessionStorage.getItem("accessToken");
+    const token = sessionStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -71,7 +71,7 @@ apiAxios.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = localStorage.getItem("refreshToken");
+      const refreshToken = localStorage.getItem('refreshToken');
 
       if (!refreshToken) {
         // No refresh token, logout immediately
@@ -88,7 +88,7 @@ apiAxios.interceptors.response.use(
         const { accessToken } = response.data;
 
         // Save new tokens
-        sessionStorage.setItem("accessToken", accessToken);
+        sessionStorage.setItem('accessToken', accessToken);
 
         // Update authorization header for original request
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
@@ -103,7 +103,7 @@ apiAxios.interceptors.response.use(
         processQueue(refreshError, null);
         handleLogout();
 
-        notificationService.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
+        notificationService.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!');
 
         return Promise.reject(refreshError);
       } finally {
@@ -117,16 +117,16 @@ apiAxios.interceptors.response.use(
 
 // Logout helper function
 const handleLogout = () => {
-  sessionStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
-  localStorage.removeItem("user"); // Clear user data if stored
+  sessionStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+  localStorage.removeItem('user'); // Clear user data if stored
   // Redirect to login page
-  window.location.href = "/login";
+  window.location.href = '/login';
 };
 
 // Helper functions for common API patterns
 export const handleApiError = (error) => {
-  console.error("API Error:", error);
+  console.error('API Error:', error);
   return error;
 };
 
@@ -137,17 +137,17 @@ export const createAuthHeaders = (token) => ({
 // Helper for multipart/form-data requests (file uploads)
 export const createMultipartConfig = (token) => ({
   headers: {
-    "Content-Type": "multipart/form-data",
+    'Content-Type': 'multipart/form-data',
     ...(token && { Authorization: `Bearer ${token}` }),
   },
 });
 
 // Manual token refresh function (optional)
 export const refreshTokenManually = async () => {
-  const refreshToken = localStorage.getItem("refreshToken");
+  const refreshToken = localStorage.getItem('refreshToken');
 
   if (!refreshToken) {
-    throw new Error("No refresh token available");
+    throw new Error('No refresh token available');
   }
 
   try {
@@ -157,9 +157,9 @@ export const refreshTokenManually = async () => {
 
     const { accessToken, refreshToken: newRefreshToken } = response.data;
 
-    sessionStorage.setItem("accessToken", accessToken);
+    sessionStorage.setItem('accessToken', accessToken);
     if (newRefreshToken) {
-      localStorage.setItem("refreshToken", newRefreshToken);
+      localStorage.setItem('refreshToken', newRefreshToken);
     }
 
     return { accessToken, refreshToken: newRefreshToken };
@@ -171,7 +171,7 @@ export const refreshTokenManually = async () => {
 
 // Check if tokens are available
 export const isAuthenticated = () => {
-  const accessToken = sessionStorage.getItem("accessToken");
-  const refreshToken = localStorage.getItem("refreshToken");
+  const accessToken = sessionStorage.getItem('accessToken');
+  const refreshToken = localStorage.getItem('refreshToken');
   return !!accessToken && !!refreshToken;
 };

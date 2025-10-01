@@ -1,14 +1,31 @@
-import BaseService from "./base/BaseService";
+import BaseService from './base/BaseService';
 
 class DepartmentService extends BaseService {
   constructor() {
-    super("/department");
+    super('/department');
   }
 
-  // Arrow functions để giữ this
-  getListDepartment = async () => this.get("/");
+  
+  getListDepartment = async () => {
+    const response = await this.get('/');
+    const departments = response.departments || [];
 
-  createDepartment = async (data) => this.post("/", data);
+    const childrenMap = new Map();
+    departments.forEach((dept) => {
+      if(dept.parent_id) {
+          if(!childrenMap.has(dept.parent_id)) {
+            childrenMap.set(dept.parent_id, []);
+          }
+          childrenMap.get(dept.parent_id).push(dept.id);
+      }
+    })
+    return departments.map((dept) => ({
+      ...dept,
+      children: childrenMap.get(dept.id) || [],
+    }))
+  } ;
+
+  createDepartment = async (data) => this.post('/', data);
 
   deleteDepartment = async (idDepartment) => this.delete(`/${idDepartment}`);
 

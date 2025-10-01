@@ -1,35 +1,36 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { useAppSelector, useAppDispatch } from "../store/hooks";
-import { refreshToken, logoutUser } from "../store/slices/authSlice";
-import { store } from "../store";
-import { Spin } from "antd";
-import { ROLE } from "../constants";
+import { createContext, useContext, useEffect, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { refreshToken, logoutUser } from '../store/slices/authSlice';
+import { store } from '../store';
+import { Spin } from 'antd';
+import { ROLE } from '../constants';
 const AuthContext = createContext(null);
 
 // Routes that don't require authentication
 const PUBLIC_ROUTES = [
-  "/login",
-  "/register",
-  "/forgot-password",
-  "/reset-password",
-  "/verify-email",
-  "/about",
-  "/contact",
-  "/privacy",
-  "/terms",
-  "/", // Homepage might be public
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/verify-email',
+  '/about',
+  '/contact',
+  '/privacy',
+  '/terms',
+  '/', // Homepage might be public
 ];
 
 // Routes that require authentication
-const PROTECTED_ROUTES = ["/home"];
+const PROTECTED_ROUTES = ['/home'];
 
 // Routes only for unauthenticated users (redirect to dashboard if logged in)
-const GUEST_ONLY_ROUTES = ["/login", "/register", "/forgot-password", "/reset-password"];
+const GUEST_ONLY_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password'];
 
 // Admin-only routes
-const ADMIN_ROUTES = ["/admin"];
-
+const ADMIN_ROUTES = ['/admin'];
+// login routes
+const LOGIN_ROUTES = ['/login'];
 export const AuthProvider = ({ children }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -42,7 +43,7 @@ export const AuthProvider = ({ children }) => {
   // Check if current route requires authentication
   const isPublicRoute = () => {
     return PUBLIC_ROUTES.some((route) => {
-      if (route === "/") return pathname === "/";
+      if (route === '/') return pathname === '/';
       return pathname.startsWith(route);
     });
   };
@@ -58,6 +59,9 @@ export const AuthProvider = ({ children }) => {
   const isAdminRoute = () => {
     return ADMIN_ROUTES.some((route) => pathname.startsWith(route));
   };
+  const isLoginRoute = () => {
+    return LOGIN_ROUTES.some((route) => pathname.startsWith(route));
+  };
 
   // Check if user has required permissions
   const hasPermissionAdmin = () => {
@@ -72,7 +76,7 @@ export const AuthProvider = ({ children }) => {
     if (!token) return true;
 
     try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
+      const payload = JSON.parse(atob(token.split('.')[1]));
       const currentTime = Date.now() / 1000;
       return payload.exp < currentTime + 300; // 5 minutes buffer
     } catch {
@@ -83,33 +87,33 @@ export const AuthProvider = ({ children }) => {
   // Initialize authentication state
   const initializeAuth = async () => {
     try {
-      console.log("🔐 Initializing authentication...");
+      console.log('🔐 Initializing authentication...');
 
       // Initialize auth state from storage
-      dispatch({ type: "auth/initializeAuth" });
+      dispatch({ type: 'auth/initializeAuth' });
 
       // Wait for state to update
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       const currentState = store.getState().auth;
-      const {  accessToken: token, refreshToken: refToken } = currentState;
+      const { accessToken: token, refreshToken: refToken } = currentState;
 
       if (refToken) {
         // Check if token needs refresh
         if (!token || isTokenExpired(token)) {
           try {
             await dispatch(refreshToken()).unwrap();
-            console.log("✅ Token refreshed successfully");
+            console.log('✅ Token refreshed successfully');
           } catch (error) {
-            console.error("❌ Token refresh failed:", error);
+            console.error('❌ Token refresh failed:', error);
             await dispatch(logoutUser());
-            router.push("/login");
+            router.push('/login');
             return;
           }
         }
       }
     } catch (error) {
-      console.error("💥 Auth initialization failed:", error);
+      console.error('💥 Auth initialization failed:', error);
     } finally {
       setIsInitializing(false);
       setAuthChecked(true);
@@ -124,27 +128,27 @@ export const AuthProvider = ({ children }) => {
     console.log(`🛡️ Checking route protection for: ${currentPath}`);
     // Case 1: Guest-only routes + user is authenticated; nếu user đã login nhưng vào trang login, register,.. -> đá vào trang home
     if (isGuestOnlyRoute() && isAuthenticated) {
-      console.log("🔄 Authenticated user accessing guest route, redirecting to dashboard");
-      router.replace("/");
+      console.log('🔄 Authenticated user accessing guest route, redirecting to dashboard');
+      router.replace('/');
       return;
     }
 
     // Case 2: Protected routes + user not authenticated
     if (isProtectedRoute() && !isAuthenticated) {
-      console.log("🚫 Unauthenticated user accessing protected route, redirecting to login");
-      router.replace("/login");
+      console.log('🚫 Unauthenticated user accessing protected route, redirecting to login');
+      router.replace('/login');
       return;
     }
 
     // Case 3: Admin routes + user is not admin
     if (isAdminRoute() && isAuthenticated && !hasPermissionAdmin()) {
-      console.log("🚫 Non-admin user accessing admin route, redirecting");
-      router.replace("/forbidden");
+      console.log('🚫 Non-admin user accessing admin route, redirecting');
+      router.replace('/forbidden');
       return;
     }
 
     // Case 4: All good
-    console.log("✅ Route access granted");
+    console.log('✅ Route access granted');
   };
 
   // Initialize on mount
@@ -185,14 +189,14 @@ export const AuthProvider = ({ children }) => {
 
     const checkTokenExpiry = async () => {
       if (isTokenExpired(accessToken)) {
-        console.log("⏰ AccessToken expired, trying to refresh...");
+        console.log('⏰ AccessToken expired, trying to refresh...');
 
         if (refreshToken) {
           try {
             await dispatch(refreshToken()).unwrap();
-            console.log("✅ Token refreshed successfully");
+            console.log('✅ Token refreshed successfully');
           } catch {
-            console.log("❌ Refresh failed, logging out");
+            console.log('❌ Refresh failed, logging out');
             dispatch(logoutUser());
           }
         } else {
@@ -218,13 +222,14 @@ export const AuthProvider = ({ children }) => {
     hasPermissionAdmin,
     isPublicRoute,
     isProtectedRoute,
-    isAdminRoute,
+    isAdminRoute: ADMIN_ROUTES.some((route) => pathname.startsWith(route)),
+    isLoginRoute: LOGIN_ROUTES.some((route) => pathname.startsWith(route)),
   };
 
   // Loading screen during initialization
   if (isInitializing) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="text-center">
           <Spin size="large" />
           <p className="mt-4 text-gray-600">Initializing application...</p>
@@ -236,7 +241,7 @@ export const AuthProvider = ({ children }) => {
   // Show loading for protected routes while checking auth
   if (!authChecked && isProtectedRoute()) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <Spin size="large" />
           <p className="mt-4 text-gray-600">Checking authentication...</p>
@@ -252,7 +257,7 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

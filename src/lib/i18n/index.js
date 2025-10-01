@@ -1,13 +1,13 @@
-import { createInstance } from "i18next";
-import { initReactI18next } from "react-i18next";
-import Backend from "i18next-fs-backend";
-import LanguageDetector from "i18next-browser-languagedetector";
+import { createInstance } from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import Backend from 'i18next-fs-backend';
+import LanguageDetector from 'i18next-browser-languagedetector';
 
 // Import translation files
-import enTranslations from "../../public/locales/en/common.json";
-import viTranslations from "../../public/locales/vi/common.json";
+import enTranslations from '../../public/locales/en/common.json';
+import viTranslations from '../../public/locales/vi/common.json';
 
-const createI18nInstance = (locale = "en", namespace = "common") => {
+const createI18nInstance = (locale = 'en', namespace = 'common') => {
   const i18nInstance = createInstance();
 
   i18nInstance
@@ -16,8 +16,8 @@ const createI18nInstance = (locale = "en", namespace = "common") => {
     .use(initReactI18next)
     .init({
       lng: locale,
-      fallbackLng: "en",
-      debug: process.env.NODE_ENV === "development",
+      fallbackLng: 'en',
+      debug: process.env.NODE_ENV === 'development',
 
       ns: [namespace],
       defaultNS: namespace,
@@ -36,8 +36,8 @@ const createI18nInstance = (locale = "en", namespace = "common") => {
       },
 
       detection: {
-        order: ["cookie", "header", "querystring", "localStorage", "navigator"],
-        caches: ["localStorage", "cookie"],
+        order: ['cookie', 'header', 'querystring', 'localStorage', 'navigator'],
+        caches: ['localStorage', 'cookie'],
       },
     });
 

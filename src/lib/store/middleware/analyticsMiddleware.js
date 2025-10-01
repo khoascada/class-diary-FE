@@ -1,13 +1,12 @@
-
 // Thống kê hành vi người dùng
 const analyticsMiddleware = (store) => (next) => (action) => {
   const result = next(action);
-  
+
   // Only track in production
   if (process.env.NODE_ENV !== 'production' || typeof window === 'undefined') {
     return result;
   }
-  
+
   // Define trackable actions
   const trackableActions = {
     'auth/loginUser/fulfilled': {
@@ -37,32 +36,31 @@ const analyticsMiddleware = (store) => (next) => (action) => {
       }),
     },
   };
-  
+
   const trackConfig = trackableActions[action.type];
   if (trackConfig) {
     try {
       const properties = trackConfig.properties ? trackConfig.properties(action) : {};
-      
+
       // Google Analytics
       if (window.gtag) {
         window.gtag('event', trackConfig.event, properties);
       }
-      
+
       // Facebook Pixel
       if (window.fbq) {
         window.fbq('track', trackConfig.event, properties);
       }
-      
+
       // Custom analytics service
       if (window.analytics) {
         window.analytics.track(trackConfig.event, properties);
       }
-      
     } catch (error) {
       console.error('Analytics tracking error:', error);
     }
   }
-  
+
   return result;
 };
 

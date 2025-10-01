@@ -3,11 +3,11 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { Spin, Result } from 'antd';
 
-export const ProtectedRoute = ({ 
-  children, 
+export const ProtectedRoute = ({
+  children,
   adminOnly = false,
   guestOnly = false,
-  fallback = null 
+  fallback = null,
 }) => {
   const { isAuthenticated, user, isInitializing, hasPermission } = useAuth();
   const router = useRouter();
@@ -38,45 +38,53 @@ export const ProtectedRoute = ({
 
   // Loading state
   if (isInitializing) {
-    return fallback || (
-      <div className="min-h-screen flex items-center justify-center">
-        <Spin size="large" />
-      </div>
+    return (
+      fallback || (
+        <div className="flex min-h-screen items-center justify-center">
+          <Spin size="large" />
+        </div>
+      )
     );
   }
 
   // Guest only + authenticated user
   if (guestOnly && isAuthenticated) {
-    return fallback || (
-      <div className="min-h-screen flex items-center justify-center">
-        <Spin size="large" />
-      </div>
+    return (
+      fallback || (
+        <div className="flex min-h-screen items-center justify-center">
+          <Spin size="large" />
+        </div>
+      )
     );
   }
 
   // Protected route + unauthenticated user
   if (!guestOnly && !isAuthenticated) {
-    return fallback || (
-      <div className="min-h-screen flex items-center justify-center">
-        <Result
-          status="403"
-          title="Authentication Required"
-          subTitle="Please login to access this page"
-        />
-      </div>
+    return (
+      fallback || (
+        <div className="flex min-h-screen items-center justify-center">
+          <Result
+            status="403"
+            title="Authentication Required"
+            subTitle="Please login to access this page"
+          />
+        </div>
+      )
     );
   }
 
   // Admin route + non-admin user
   if (adminOnly && isAuthenticated && !hasPermission()) {
-    return fallback || (
-      <div className="min-h-screen flex items-center justify-center">
-        <Result
-          status="403"
-          title="Access Denied"
-          subTitle="You don't have permission to access this page"
-        />
-      </div>
+    return (
+      fallback || (
+        <div className="flex min-h-screen items-center justify-center">
+          <Result
+            status="403"
+            title="Access Denied"
+            subTitle="You don't have permission to access this page"
+          />
+        </div>
+      )
     );
   }
 

@@ -16,9 +16,9 @@ export const useSocket = (options = {}) => {
 
     return () => {
       // Cleanup component-specific event listeners
-      cleanupFunctions.current.forEach(cleanup => cleanup());
+      cleanupFunctions.current.forEach((cleanup) => cleanup());
       cleanupFunctions.current = [];
-      
+
       if (!isAuthenticated) {
         socketManager.disconnect();
       }
@@ -37,8 +37,6 @@ export const useSocket = (options = {}) => {
   const emit = useCallback((event, data) => {
     socketManager.emit(event, data);
   }, []);
-
-
 
   return {
     socket: socketRef.current,

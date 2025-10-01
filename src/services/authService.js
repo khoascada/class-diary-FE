@@ -1,5 +1,4 @@
 import BaseService from './base/BaseService';
-import { API_ENDPOINTS } from '../constants';
 
 class AuthService extends BaseService {
   constructor() {
@@ -7,54 +6,40 @@ class AuthService extends BaseService {
   }
 
   // Login
-  async login(credentials) {
-    return this.post('/login', credentials);
-  }
+  login = async (credentials) => this.post('/login', credentials);
 
   // Register
-  async register(userData) {
-    return this.post('/register', userData);
-  }
+  register = async (userData) => this.post('/register', userData);
 
   // Logout
-  async logout() {
-    return this.post('/logout');
-  }
+  logout = async () => this.post('/logout');
 
   // Refresh token
-  async refreshToken(refreshToken) {
-    return this.post('/refresh', { refreshToken });
-  }
+  refreshToken = async (refreshToken) => 
+    this.post('/refresh', { refreshToken });
 
   // Forgot password
-  async forgotPassword(email) {
-    return this.post('/forgot-password', { email });
-  }
+  forgotPassword = async (email) => 
+    this.post('/forgot-password', { email });
 
   // Reset password
-  async resetPassword(token, password) {
-    return this.post('/reset-password', { token, password });
-  }
+  resetPassword = async (token, password) => 
+    this.post('/reset-password', { token, password });
 
   // Verify email
-  async verifyEmail(token) {
-    return this.post('/verify-email', { token });
-  }
+  verifyEmail = async (token) => 
+    this.post('/verify-email', { token });
 
   // Change password
-  async changePassword(currentPassword, newPassword) {
-    return this.put('/change-password', {
-      currentPassword,
-      newPassword,
-    });
-  }
+  changePassword = async (currentPassword, newPassword) => 
+    this.put('/change-password', { currentPassword, newPassword });
 
   // Check email availability
-  async checkEmailAvailability(email) {
+  checkEmailAvailability = async (email) => {
     const query = this.buildQuery({ email });
     return this.get(`/check-email?${query}`);
-  }
+  };
 }
 
-const authService = new AuthService()
+const authService = new AuthService();
 export default authService;

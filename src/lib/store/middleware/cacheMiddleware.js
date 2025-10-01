@@ -10,12 +10,12 @@ const cacheMiddleware = (store) => (next) => (action) => {
   // Only cache successful GET requests
   if (action.type.endsWith('/fulfilled') && action.meta?.arg?.method === 'GET') {
     const cacheKey = `${action.type}_${JSON.stringify(action.meta.arg)}`;
-    
+
     cache.set(cacheKey, {
       data: action.payload,
       timestamp: Date.now(),
     });
-    
+
     // Clean up expired cache entries
     setTimeout(() => {
       if (cache.has(cacheKey)) {
@@ -26,7 +26,7 @@ const cacheMiddleware = (store) => (next) => (action) => {
       }
     }, CACHE_DURATION);
   }
-  
+
   return next(action);
 };
 
@@ -34,11 +34,11 @@ const cacheMiddleware = (store) => (next) => (action) => {
 export const getCachedData = (actionType, args) => {
   const cacheKey = `${actionType}/fulfilled_${JSON.stringify(args)}`;
   const entry = cache.get(cacheKey);
-  
+
   if (entry && Date.now() - entry.timestamp < CACHE_DURATION) {
     return entry.data;
   }
-  
+
   return null;
 };
 

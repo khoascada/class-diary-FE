@@ -6,34 +6,28 @@ class UserService extends BaseService {
   }
 
   // Get current user profile
-  async getProfile() {
-    return this.get('/profile');
-  }
+  getProfile = async () => this.get('/profile');
 
   // Update user profile
-  async updateProfile(profileData) {
-    return this.put('/profile', profileData);
-  }
+  updateProfile = async (profileData) => this.put('/profile', profileData);
 
   // Upload avatar
-  async uploadAvatar(file) {
+  uploadAvatar = async (file) => {
     const formData = new FormData();
     formData.append('avatar', file);
-    
+
     return this.post('/avatar', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-  }
+  };
 
   // Get user by ID
-  async getUserById(userId) {
-    return this.get(`/${userId}`);
-  }
+  getUserById = async (userId) => this.get(`/${userId}`);
 
   // Get users list with pagination
-  async getUsers(params = {}) {
+  getUsers = async (params = {}) => {
     const defaultParams = {
       page: 1,
       limit: 20,
@@ -41,32 +35,26 @@ class UserService extends BaseService {
       order: 'desc',
       ...params,
     };
-    
+
     const query = this.buildQuery(defaultParams);
     return this.get(`?${query}`);
-  }
+  };
 
   // Search users
-  async searchUsers(searchTerm, filters = {}) {
+  searchUsers = async (searchTerm, filters = {}) => {
     const params = {
       search: searchTerm,
       ...filters,
     };
     const query = this.buildQuery(params);
     return this.get(`/search?${query}`);
-  }
-
+  };
 
   // Block/Unblock user
-  async blockUser(userId) {
-    return this.post(`/${userId}/block`);
-  }
+  blockUser = async (userId) => this.post(`/${userId}/block`);
 
-  async unblockUser(userId) {
-    return this.delete(`/${userId}/block`);
-  }
-
+  unblockUser = async (userId) => this.delete(`/${userId}/block`);
 }
 
-const userService = new UserService()
+const userService = new UserService();
 export default userService;

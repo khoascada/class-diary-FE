@@ -1,15 +1,15 @@
 @theme inline {
   /* Fonts cho toàn bộ ứng dụng */
-  --font-heading: "Playfair Display", serif;
-  --font-body: "Inter", sans-serif;
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
   --font-primary: 'Inter', sans-serif;
-  --font-login: "Montserrat", sans-serif;
-  --font-vn: "Be Vietnam Pro", sans-serif;
+  --font-login: 'Montserrat', sans-serif;
+  --font-vn: 'Be Vietnam Pro', sans-serif;
 
   /* Fonts bổ sung */
-  --font-code: "Fira Code", monospace;        /* cho code, terminal */
-  --font-button: "Poppins", sans-serif;       /* cho nút bấm nổi bật */
-  --font-accent: "Lora", serif;               /* cho quote, highlight */
-  --font-mono: "Source Code Pro", monospace; /* font monospace thay thế */
-  --font-alt: "Roboto Slab", serif;           /* font thay thế khi cần */
+  --font-code: 'Fira Code', monospace; /* cho code, terminal */
+  --font-button: 'Poppins', sans-serif; /* cho nút bấm nổi bật */
+  --font-accent: 'Lora', serif; /* cho quote, highlight */
+  --font-mono: 'Source Code Pro', monospace; /* font monospace thay thế */
+  --font-alt: 'Roboto Slab', serif; /* font thay thế khi cần */
 }

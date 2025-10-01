@@ -1,56 +1,56 @@
 // CustomButton.jsx
-import { Button } from "antd";
-import styles from "./CustomButton.module.css"; // Import như object
+import { Button } from 'antd';
+import styles from './CustomButton.module.css'; // Import như object
 
 const colors = {
-  primary: "#F88888",
-  secondary: "#6B7280",
-  success: "#10b926ff",
-  add: "#3B82F6",
-  save: "#22c55e" ,
-  edit: "#f97316",
-  delete: "#EF4444",
-  warning: "#F59E0B",
-  info: "#3B82F6",
-  mark: "#f97316",
+  primary: '#F88888',
+  secondary: '#6B7280',
+  success: '#10b926ff',
+  add: '#3B82F6',
+  save: '#22c55e',
+  edit: '#f97316',
+  delete: '#EF4444',
+  warning: '#F59E0B',
+  info: '#3B82F6',
+  mark: '#f97316',
 };
 
 export default function CustomButton({
-  color = "primary",
-  variant = "solid",
+  color = 'primary',
+  variant = 'solid',
   children,
   style,
   icon,
-  className = "",
+  className = '',
   ...props
 }) {
   const baseColor = colors[color] || colors.primary;
 
   const getButtonStyle = () => {
     switch (variant) {
-      case "solid":
+      case 'solid':
         return {
-          "--btn-color": baseColor,
+          '--btn-color': baseColor,
           backgroundColor: baseColor,
           borderColor: baseColor,
-          color: "#ffffff",
+          color: '#ffffff',
           ...style,
         };
 
-      case "outline":
+      case 'outline':
         return {
-          "--btn-color": baseColor,
-          backgroundColor: "transparent",
+          '--btn-color': baseColor,
+          backgroundColor: 'transparent',
           borderColor: baseColor,
           color: baseColor,
           ...style,
         };
 
-      case "text":
+      case 'text':
         return {
-          "--btn-color": baseColor,
-          backgroundColor: "transparent",
-          borderColor: "transparent",
+          '--btn-color': baseColor,
+          backgroundColor: 'transparent',
+          borderColor: 'transparent',
           color: baseColor,
           ...style,
         };

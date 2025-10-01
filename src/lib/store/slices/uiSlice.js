@@ -1,7 +1,7 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   sidebarOpen: false,
-  theme: "light",
+  theme: 'light',
   notifications: [],
   modals: {
     loginModal: false,
@@ -13,7 +13,7 @@ const initialState = {
   },
 };
 const uiSlice = createSlice({
-  name: "ui",
+  name: 'ui',
   initialState,
   reducers: {
     toggleSidebar: (state) => {
@@ -32,7 +32,9 @@ const uiSlice = createSlice({
       });
     },
     removeNotification: (state, action) => {
-      state.notifications = state.notifications.filter((notification) => notification.id !== action.payload);
+      state.notifications = state.notifications.filter(
+        (notification) => notification.id !== action.payload
+      );
     },
     toggleModal: (state, action) => {
       const { modalName, isOpen } = action.payload;
@@ -52,7 +54,7 @@ const uiSlice = createSlice({
       };
     },
     initializeUIPreferences: (state) => {
-      const uiPreferences = JSON.parse(localStorage.getItem("uiPreferences"));
+      const uiPreferences = JSON.parse(localStorage.getItem('uiPreferences'));
       if (uiPreferences) {
         state.theme = uiPreferences.theme;
         state.sidebarOpen = uiPreferences.sidebarOpen;

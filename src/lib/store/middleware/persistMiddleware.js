@@ -4,23 +4,23 @@ import { storage } from '../../utils/storage';
 // lưu state vào local để khi tắt trình duyệt vẫn còn
 const persistMiddleware = (store) => (next) => (action) => {
   const result = next(action);
-  
+
   // List of actions that should trigger persistence
   const persistActions = [
     // Auth actions
     'auth/loginUser/fulfilled',
     'auth/updateProfile/fulfilled',
     'auth/initializeAuth',
-    
+
     // UI preferences
     'ui/setTheme',
     'ui/toggleSidebar',
     'user/updatePreferences',
   ];
-  
-  if (persistActions.some(actionType => action.type === actionType)) {
+
+  if (persistActions.some((actionType) => action.type === actionType)) {
     const state = store.getState();
-    
+
     try {
       // Persist auth state
       if (action.type.startsWith('auth/')) {
@@ -30,7 +30,7 @@ const persistMiddleware = (store) => (next) => (action) => {
           storage.setLocal('isAuthenticated', isAuthenticated);
         }
       }
-      
+
       // Persist UI preferences
       if (action.type.startsWith('ui/')) {
         storage.setLocal('uiPreferences', {
@@ -38,17 +38,16 @@ const persistMiddleware = (store) => (next) => (action) => {
           sidebarOpen: state.ui.sidebarOpen,
         });
       }
-      
+
       // Persist user preferences
       if (action.type.startsWith('user/updatePreferences')) {
         storage.setLocal('userPreferences', state.user.preferences);
       }
-      
     } catch (error) {
       console.error('Failed to persist state:', error);
     }
   }
-  
+
   return result;
 };
 

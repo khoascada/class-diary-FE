@@ -1,58 +1,70 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { apiAxios } from "../../api";
-import axios from "axios";
-import { notificationService } from "@/lib/utils/notificationService";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { apiAxios } from '../../api';
+import axios from 'axios';
+import { notificationService } from '@/lib/utils/notificationService';
 // Async thunks
-export const loginUser = createAsyncThunk("auth/loginUser", async (credentials, { rejectWithValue }) => {
-  try {
-    const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL_API}/auth/login`, credentials);
-    const { accessToken, refreshToken, user } = response.data;
+export const loginUser = createAsyncThunk(
+  'auth/loginUser',
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL_API}/auth/login`,
+        credentials
+      );
+      const { accessToken, refreshToken, user } = response.data;
 
-    // Save tokens to storage
-    sessionStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("refreshToken", refreshToken);
+      // Save tokens to storage
+      sessionStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
 
-    return { user, accessToken, refreshToken };
-  } catch (error) {
-    const errMsg = error.response?.data?.message || "Login failed";
+      return { user, accessToken, refreshToken };
+    } catch (error) {
+      const errMsg = error.response?.data?.message || 'Login failed';
 
-    notificationService.error("Login failed!");
+      notificationService.error('Login failed!');
 
-    return rejectWithValue(errMsg);
+      return rejectWithValue(errMsg);
+    }
   }
-});
+);
 
-export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
+export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
   try {
-    const refreshToken = localStorage.getItem("refreshToken");
-    await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL_API}/auth/logout`, {refresh_token: refreshToken});
+    const refreshToken = localStorage.getItem('refreshToken');
+    await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL_API}/auth/logout`, {
+      refresh_token: refreshToken,
+    });
   } catch (error) {
-    console.error('Error logout:', error)
-    notificationService.error("Logout failed!");
+    console.error('Error logout:', error);
+    notificationService.error('Logout failed!');
   } finally {
-    sessionStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("user");
-    localStorage.removeItem("isAuthenticated");
+    sessionStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('isAuthenticated');
   }
 });
 
-export const refreshToken = createAsyncThunk("auth/refreshToken", async (_, { rejectWithValue }) => {
-  try {
-    const refreshToken = localStorage.getItem("refreshToken");
-    if (!refreshToken) throw new Error("No refresh token");
+export const refreshToken = createAsyncThunk(
+  'auth/refreshToken',
+  async (_, { rejectWithValue }) => {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (!refreshToken) throw new Error('No refresh token');
 
-    const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL_API}/auth/refresh`, { refresh_token: refreshToken });
-    const { accessToken } = response.data;
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL_API}/auth/refresh`, {
+        refresh_token: refreshToken,
+      });
+      const { accessToken } = response.data;
 
-    sessionStorage.setItem("accessToken", accessToken);
-   
+      sessionStorage.setItem('accessToken', accessToken);
 
-    return { accessToken };
-  } catch (error) {
-    return rejectWithValue("Token refresh failed");
+      return { accessToken };
+    } catch (error) {
+      return rejectWithValue('Token refresh failed');
+    }
   }
-});
+);
 
 const initialState = {
   user: null,
@@ -64,24 +76,24 @@ const initialState = {
 };
 
 const authSlice = createSlice({
-  name: "auth",
+  name: 'auth',
   initialState,
   reducers: {
     clearError: (state) => {
       state.error = null;
     },
     initializeAuth: (state) => {
-      const accessToken = sessionStorage.getItem("accessToken");
-      const refreshToken = localStorage.getItem("refreshToken");
-      const user = localStorage.getItem("user");
-      
+      const accessToken = sessionStorage.getItem('accessToken');
+      const refreshToken = localStorage.getItem('refreshToken');
+      const user = localStorage.getItem('user');
+
       if (refreshToken && user) {
         state.isAuthenticated = true;
         state.refreshToken = refreshToken;
         state.user = JSON.parse(user);
       }
       if (accessToken) {
-        state.accessToken = accessToken
+        state.accessToken = accessToken;
       }
     },
     updateTokens: (state, action) => {

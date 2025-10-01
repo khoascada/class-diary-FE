@@ -1,7 +1,7 @@
-import { createListenerMiddleware } from "@reduxjs/toolkit";
-import { loginUser, logoutUser, refreshToken } from "../slices/authSlice";
-import { clearAllData } from "../slices/uiSlice";
-import { ROLE } from "@/lib/constants";
+import { createListenerMiddleware } from '@reduxjs/toolkit';
+import { loginUser, logoutUser, refreshToken } from '../slices/authSlice';
+import { clearAllData } from '../slices/uiSlice';
+import { ROLE } from '@/lib/constants';
 
 // Create listener middleware instance
 export const authListenerMiddleware = createListenerMiddleware();
@@ -28,12 +28,12 @@ authListenerMiddleware.startListening({
     }
     // Redirect based on user role or return URL
     const hasAdminRole = user.department_roles?.some((role) => role.role_name === ROLE.ADMIN);
-    const returnUrl = sessionStorage.getItem("returnUrl");
+    const returnUrl = sessionStorage.getItem('returnUrl');
     if (returnUrl) {
-      sessionStorage.removeItem("returnUrl");
+      sessionStorage.removeItem('returnUrl');
       window.location.href = returnUrl;
     } else {
-      const defaultRoute = hasAdminRole ? "/admin" : "/home";
+      const defaultRoute = hasAdminRole ? '/admin' : '/home';
       window.location.href = defaultRoute;
     }
   },
@@ -43,7 +43,7 @@ authListenerMiddleware.startListening({
 authListenerMiddleware.startListening({
   actionCreator: logoutUser.fulfilled,
   effect: async (action, listenerApi) => {
-    console.log("👋 User logged out");
+    console.log('👋 User logged out');
 
     // Clear all app data
     listenerApi.dispatch(clearAllData());
@@ -51,15 +51,15 @@ authListenerMiddleware.startListening({
     // Clear browser storage
     try {
       sessionStorage.clear();
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
-      localStorage.removeItem("isAuthenticated");
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      localStorage.removeItem('isAuthenticated');
     } catch (error) {
-      console.error("Error clearing storage:", error);
+      console.error('Error clearing storage:', error);
     }
 
     setTimeout(() => {
-      window.location.href = "/login";
+      window.location.href = '/login';
     }, 100);
   },
 });
@@ -69,7 +69,7 @@ authListenerMiddleware.startListening({
   actionCreator: refreshToken.fulfilled,
   effect: async (action, listenerApi) => {
     const { accessToken } = action.payload;
-    console.log("🔄 Token refreshed successfully");
+    console.log('🔄 Token refreshed successfully');
 
     // Schedule next refresh
     const tokenExpiry = parseJWT(accessToken)?.exp;
@@ -89,23 +89,23 @@ authListenerMiddleware.startListening({
   actionCreator: loginUser.rejected,
   effect: async (action, listenerApi) => {
     const error = action.payload;
-    console.error("❌ Login failed:", error);
+    console.error('❌ Login failed:', error);
 
     // Track failed login attempts
-    const attempts = parseInt(sessionStorage.getItem("loginAttempts") || "0") + 1;
-    sessionStorage.setItem("loginAttempts", attempts.toString());
+    const attempts = parseInt(sessionStorage.getItem('loginAttempts') || '0') + 1;
+    sessionStorage.setItem('loginAttempts', attempts.toString());
 
     // Block login after 5 failed attempts
     if (attempts >= 5) {
       listenerApi.dispatch({
-        type: "auth/blockLogin",
+        type: 'auth/blockLogin',
         payload: { blockedUntil: Date.now() + 15 * 60 * 1000 }, // 15 minutes
       });
     }
 
     // Analytics
-    if (typeof window !== "undefined" && window.gtag) {
-      window.gtag("event", "login_failed", {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'login_failed', {
         error_message: error,
         attempts: attempts,
       });
@@ -116,13 +116,13 @@ authListenerMiddleware.startListening({
 // Utility function to parse JWT
 const parseJWT = (token) => {
   try {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const jsonPayload = decodeURIComponent(
       atob(base64)
-        .split("")
-        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
     );
     return JSON.parse(jsonPayload);
   } catch (error) {

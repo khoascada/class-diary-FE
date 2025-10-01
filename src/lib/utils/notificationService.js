@@ -1,5 +1,5 @@
 class NotificationService {
-   constructor() {
+  constructor() {
     this.messageApi = null;
   }
   setMessageApi(api) {

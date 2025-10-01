@@ -1,15 +1,15 @@
 // hooks/useFetchService.ts
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-export const useFetchService = (serviceFn, deps = []) => {
-  const [data, setData] = useState(null);
+export const useFetchService = (serviceFn, deps = [], initialValue = null) => {
+  const [data, setData] = useState(initialValue);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const cancelledRef = useRef(false);
-  
+
   // Thêm useRef để lưu serviceFn
   const serviceFnRef = useRef(serviceFn);
-  
+
   useEffect(() => {
     serviceFnRef.current = serviceFn;
   }, [serviceFn]);
@@ -28,7 +28,7 @@ export const useFetchService = (serviceFn, deps = []) => {
       }
     } finally {
       if (!cancelledRef.current) {
-        setLoading(false); 
+        setLoading(false);
       }
     }
   }, []); // Bỏ serviceFn khỏi deps
@@ -36,7 +36,7 @@ export const useFetchService = (serviceFn, deps = []) => {
   useEffect(() => {
     cancelledRef.current = false;
     fetchData();
-    
+
     return () => {
       cancelledRef.current = true;
     };
@@ -47,5 +47,5 @@ export const useFetchService = (serviceFn, deps = []) => {
     fetchData();
   }, [fetchData]);
 
-  return { data, loading, error, refetch };
+  return { data: data ?? initialValue, loading, error, refetch };
 };

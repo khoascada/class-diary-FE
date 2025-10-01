@@ -1,7 +1,7 @@
-import { apiAxios } from "@/lib/api";
+import { apiAxios } from '@/lib/api';
 
 class BaseService {
-  constructor(baseURL = "") {
+  constructor(baseURL = '') {
     this.baseURL = baseURL; // như này thì tùy biến prefix cho từng service con
     this.api = apiAxios;
   }
@@ -69,20 +69,20 @@ class BaseService {
   }
   getDefaultMessage(status) {
     const defaults = {
-      400: "Dữ liệu không hợp lệ",
-      403: "Bạn không có quyền thực hiện",
-      404: "Không tìm thấy dữ liệu",
-      422: "Dữ liệu không hợp lệ",
-      500: "Lỗi server",
+      400: 'Dữ liệu không hợp lệ',
+      403: 'Bạn không có quyền thực hiện',
+      404: 'Không tìm thấy dữ liệu',
+      422: 'Dữ liệu không hợp lệ',
+      500: 'Lỗi server',
     };
-    return defaults[status] || "Đã có lỗi xảy ra";
+    return defaults[status] || 'Đã có lỗi xảy ra';
   }
 
   // Utility method for query parameters
   buildQuery(params) {
     const query = new URLSearchParams();
     Object.keys(params).forEach((key) => {
-      if (params[key] !== null && params[key] !== undefined && params[key] !== "") {
+      if (params[key] !== null && params[key] !== undefined && params[key] !== '') {
         query.append(key, params[key]);
       }
     });
