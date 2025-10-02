@@ -38,10 +38,10 @@ function LayoutWrapper({ children }) {
       </main>
 
       {/* Footer */}
-      <footer className="mt-8 flex w-full justify-between px-8 py-4 text-center text-sm text-gray-600 shadow-md">
+      {/* <footer className="mt-8 flex w-full justify-between px-8 py-4 text-center text-sm text-gray-600 shadow-md">
         <span>Hi im your</span>
         <span>Design by: Khoa</span>
-      </footer>
+      </footer> */}
     </div>
   );
 }

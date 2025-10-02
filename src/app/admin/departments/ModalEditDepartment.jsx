@@ -5,10 +5,17 @@ import { notificationService } from '@/lib/utils/notificationService';
 import { useFetchService } from '@/hooks/useFetch';
 import departmentService from '@/services/departmentService';
 const { TextArea } = Input;
-const ModalEditDepartment = ({ visible, departmentInit, setVisible, fetchDepartment }) => {
-  const { data: listDepartmentForParent, loading } = useFetchService(
+const ModalEditDepartment = ({
+  visible,
+  departmentInit,
+  setVisible,
+  fetchDepartment,
+  refetchSelectedDepartment,
+}) => {
+  const { data: listDepartmentForParent } = useFetchService(
     () => departmentService.getListDepartmentForUpdate(departmentInit?.id),
-    [departmentInit?.id]
+    [departmentInit?.id],
+    []
   );
 
   const [form] = Form.useForm();
@@ -28,8 +35,8 @@ const ModalEditDepartment = ({ visible, departmentInit, setVisible, fetchDepartm
       form.resetFields();
       fetchDepartment();
       setVisible(false);
+      refetchSelectedDepartment();
       notificationService.success('Tạo thành công!');
-      // Gọi API với filteredValues
     } catch (errorInfo) {
       console.log('Validate Failed:', errorInfo);
       notificationService.error('Có lỗi khi tạo phòng ban. Vui lòng tạo lại!');

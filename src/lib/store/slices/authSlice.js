@@ -21,7 +21,7 @@ export const loginUser = createAsyncThunk(
     } catch (error) {
       const errMsg = error.response?.data?.message || 'Login failed';
 
-      notificationService.error('Login failed!');
+      notificationService.error(errMsg);
 
       return rejectWithValue(errMsg);
     }

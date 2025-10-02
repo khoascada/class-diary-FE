@@ -8,7 +8,7 @@ import UserInfoModal from './UserInfoModal';
 import { useAuth } from '@/lib/providers/AuthProvider';
 const AppHeader = () => {
   const pathname = usePathname();
-  const {isAdminRoute} = useAuth()
+  const { isAdminRoute } = useAuth();
   const userInfo = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const listMenu = [
@@ -17,10 +17,10 @@ const AppHeader = () => {
     { title: 'B', path: '/B' },
   ];
   const adminMenu = [
-  { title: 'Phòng ban', path: '/admin/departments' },
-  { title: 'Vai trò', path: '/admin/roles' },
-  { title: 'Người dùng', path: '/admin/users' },
-];
+    { title: 'Phòng ban', path: '/admin/departments' },
+    { title: 'Vai trò', path: '/admin/roles' },
+    { title: 'Người dùng', path: '/admin/users' },
+  ];
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -53,9 +53,7 @@ const AppHeader = () => {
         {/* Menu giữa */}
         <nav className="flex flex-1 items-center justify-center">
           <ul className="flex gap-8">
-            {
-            
-            (isAdminRoute ? adminMenu : listMenu).map((menu) => {
+            {(isAdminRoute ? adminMenu : listMenu).map((menu) => {
               const isActive = pathname === menu.path;
               return (
                 <li key={menu.path}>

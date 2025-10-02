@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { App } from 'antd';
 import { ChevronRight, ChevronDown, Edit2, Trash2, Search, Building2 } from 'lucide-react';
 import { PlusOutlined } from '@ant-design/icons';
@@ -9,7 +9,7 @@ import { useFetchService } from '@/hooks/useFetch';
 import departmentService from '@/services/departmentService';
 import ModalAddDepartment from './ModalAddDepartment';
 import ModalEditDepartment from './ModalEditDepartment';
-import {Table} from 'antd';
+import { Table } from 'antd';
 export default function DepartmentsPage() {
   const { modal, message } = App.useApp();
 
@@ -19,9 +19,14 @@ export default function DepartmentsPage() {
     []
   );
 
-  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [selectedIdDepartment, setSelectedIdDepartment] = useState(null);
+  const { data: selectedDepartment, refetch: refetchSelectedDepartment } = useFetchService(
+    () => departmentService.getInfoDepartment(selectedIdDepartment),
+    [selectedIdDepartment],
+    {}
+  );
+
   const [expandedDepts, setExpandedDepts] = useState({});
-  const [searchDept, setSearchDept] = useState('');
   const [showDeptModal, setShowDeptModal] = useState(false);
   const [showEditDeptModal, setShowEditDeptModal] = useState(false);
 
@@ -42,13 +47,13 @@ export default function DepartmentsPage() {
   };
 
   const handleDeleteDepartment = () => {
-    if (!selectedDepartment?.id) return;
+    if (!selectedIdDepartment) return;
 
     modal.confirm({
       title: 'Xác nhận xóa',
       content: (
         <div>
-          Bạn có chắc chắn muốn xóa phòng ban <strong>{selectedDepartment.name}</strong> không?
+          Bạn có chắc chắn muốn xóa phòng ban <strong>{selectedIdDepartment.name}</strong> không?
         </div>
       ),
       okText: 'Xóa',
@@ -56,10 +61,10 @@ export default function DepartmentsPage() {
       cancelText: 'Hủy',
       onOk: async () => {
         try {
-          await departmentService.deleteDepartment(selectedDepartment.id);
+          await departmentService.deleteDepartment(selectedIdDepartment.id);
           message.success('Xóa phòng ban thành công');
           reFetchDepartments();
-          setSelectedDepartment(null);
+          setSelectedIdDepartment(null);
         } catch (err) {
           console.error('Error when delete department', err);
           message.error('Xóa phòng ban thất bại');
@@ -78,7 +83,7 @@ export default function DepartmentsPage() {
 
     const hasChildren = dept.children && dept.children.length > 0;
     const isExpanded = expandedDepts[deptId];
-    const isSelected = selectedDepartment?.id === deptId;
+    const isSelected = selectedIdDepartment === deptId;
 
     return (
       <div>
@@ -87,7 +92,7 @@ export default function DepartmentsPage() {
             isSelected ? 'border-l-4 border-blue-500 bg-blue-50' : ''
           }`}
           style={{ paddingLeft: `${level * 20 + 8}px` }}
-          onClick={() => setSelectedDepartment(dept)}
+          onClick={() => setSelectedIdDepartment(dept?.id)}
         >
           {hasChildren && (
             <button
@@ -112,28 +117,52 @@ export default function DepartmentsPage() {
     );
   };
 
-const usersTable = getUsersByDepartment(selectedDepartment?.id);
+  const usersTable = useMemo(() => {
+    if (!selectedDepartment) return [];
 
-const columns = [
-  {
-    title: 'Tên',
-    dataIndex: 'name',
-    key: 'name',
-    render: (text) => <span className="font-medium">{text}</span>,
-  },
-  {
-    title: 'Email',
-    dataIndex: 'email',
-    key: 'email',
-    render: (text) => <span className="text-gray-500">{text}</span>,
-  },
-  {
-    title: 'Số điện thoại',
-    dataIndex: 'phone',
-    key: 'phone',
-    render: (text) => <span className="text-gray-500">{text}</span>,
-  },
-];
+    const users = selectedDepartment.account_roles;
+    return users?.map((user, index) => {
+      return { ...user, key: index };
+    });
+  }, [selectedDepartment]);
+
+  const columns = [
+    {
+      title: 'STT',
+      key: 'STT',
+      width: '5%',
+      align: 'center',
+      render: (text, _, index) => index + 1,
+    },
+
+    {
+      title: 'Tên',
+      dataIndex: 'user_name',
+      key: 'user_name',
+      width: '20%',
+      render: (text) => <span className="font-medium">{text ? text : '-'}</span>,
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      width: '20%',
+      render: (text) => <span className="text-gray-500">{text ? text : '-'}</span>,
+    },
+    {
+      title: 'Số điện thoại',
+      dataIndex: 'phone',
+      key: 'phone',
+      width: '15%',
+      render: (text) => <span className="text-gray-500">{text ? text : '-'}</span>,
+    },
+    {
+      title: 'Vai trò',
+      dataIndex: 'role_name',
+      key: 'role_name',
+      render: (text) => <span className="text-gray-500">{text ? text : '-'}</span>,
+    },
+  ];
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -155,17 +184,19 @@ const columns = [
 
       {/* Department Detail */}
       <div>
-        {selectedDepartment ? (
+        {selectedIdDepartment ? (
           <div className="flex flex-col gap-4">
             <div className="mb-4 flex items-start justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">{selectedDepartment.name}</h3>
+
                 <p className="mt-1 text-sm text-gray-600">
-                  <span>Mô tả: {selectedDepartment.description}</span> -
+                  <span>Mô tả: {selectedDepartment.description}</span>
                   {selectedDepartment.parent && (
-                    <span className="ml-1">Thuộc: {selectedDepartment.parent.name}</span>
+                    <span className="ml-1">- Thuộc: {selectedDepartment.parent.name}</span>
                   )}
                 </p>
+                <p className="mt-1 text-sm text-gray-600">Mã: {selectedDepartment.code}</p>
               </div>
               <div className="flex gap-2">
                 <CustomButton variant="text" color="edit" onClick={handleEditDepartment}>
@@ -182,10 +213,10 @@ const columns = [
               <Table
                 dataSource={usersTable}
                 columns={columns}
-                rowKey="id"
+                rowKey="key"
                 pagination={false}
                 locale={{ emptyText: 'Chưa có nhân viên' }}
-                className=" overflow-y-auto rounded-lg"
+                className="overflow-y-auto rounded-lg"
               />
             </div>
           </div>
@@ -208,6 +239,7 @@ const columns = [
         departmentInit={selectedDepartment}
         setVisible={setShowEditDeptModal}
         fetchDepartment={reFetchDepartments}
+        refetchSelectedDepartment={refetchSelectedDepartment}
       />
     </div>
   );

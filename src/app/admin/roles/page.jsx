@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Shield, Edit2, Trash2 } from 'lucide-react';
-import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import { Shield, Edit2, Trash2, Plus } from 'lucide-react';
+import { SaveOutlined } from '@ant-design/icons';
 import CustomButton from '@/components/button/CustomButton';
 import { useFetchService } from '@/hooks/useFetch';
 import roleService from '@/services/roleService';
@@ -13,14 +13,14 @@ export default function RolesPage() {
     [],
     []
   );
-
-   const [roles] = useState([
-      { id: 1, name: 'Hiệu Trưởng', description: 'Quản lý toàn trường' },
-      { id: 2, name: 'Phó Hiệu Trưởng', description: 'Hỗ trợ điều hành' },
-      { id: 3, name: 'Trưởng Khối', description: 'Quản lý khối/tổ chuyên môn' },
-      { id: 4, name: 'Giáo Viên Chủ Nhiệm', description: 'Phụ trách lớp học' },
-      { id: 5, name: 'Giáo Viên Bộ Môn', description: 'Giảng dạy môn học' },
-    ]);
+  // Mock data - Roles
+  const [roles] = useState([
+    { id: 1, name: 'Hiệu Trưởng', description: 'Quản lý toàn trường' },
+    { id: 2, name: 'Phó Hiệu Trưởng', description: 'Hỗ trợ điều hành' },
+    { id: 3, name: 'Trưởng Khối', description: 'Quản lý khối/tổ chuyên môn' },
+    { id: 4, name: 'Giáo Viên Chủ Nhiệm', description: 'Phụ trách lớp học' },
+    { id: 5, name: 'Giáo Viên Bộ Môn', description: 'Giảng dạy môn học' },
+  ]);
   const [selectedRole, setSelectedRole] = useState(null);
   const [rolePermissions, setRolePermissions] = useState({
     1: ['CAN_CREATE_SDB', 'CAN_EDIT_ALL_SDB', 'CAN_DELETE_SDB'],
@@ -37,8 +37,10 @@ export default function RolesPage() {
     { id: 'CAN_MANAGE_USERS', name: 'Quản Lý Người Dùng', category: 'Hệ Thống' },
     { id: 'CAN_MANAGE_DEPARTMENTS', name: 'Quản Lý Phòng Ban', category: 'Hệ Thống' },
     { id: 'CAN_MANAGE_ROLES', name: 'Quản Lý Vai Trò', category: 'Hệ Thống' },
+    { id: 'CAN_ASSIGN_PERMISSIONS', name: 'Phân Quyền', category: 'Hệ Thống' },
     { id: 'CAN_VIEW_REPORTS', name: 'Xem Báo Cáo', category: 'Báo Cáo' },
     { id: 'CAN_EXPORT_DATA', name: 'Xuất Dữ Liệu', category: 'Báo Cáo' },
+    { id: 'CAN_APPROVE_SDB', name: 'Phê Duyệt Sổ Đầu Bài', category: 'Quy Trình' },
   ];
 
   const togglePermission = (roleId, permId) => {
@@ -58,126 +60,167 @@ export default function RolesPage() {
   }, {});
 
   return (
-    <div className="space-y-6">
-      {/* Role List */}
-      <div className="rounded-lg bg-white p-6 shadow">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-800">Quản lý vai trò</h2>
-          <CustomButton color="add" icon={<PlusOutlined />}>
-            Tạo Vai Trò
-          </CustomButton>
+    <div className="p-6">
+      <div className="mx-auto max-w-7xl">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">Quản Lý Vai Trò & Phân Quyền</h1>
+          <p className="mt-2 text-gray-600">Quản lý các vai trò và phân quyền cho hệ thống</p>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          {roles.map((role) => (
-            <div
-              key={role.id}
-              className={`cursor-pointer rounded-lg border p-4 hover:bg-gray-50 ${
-                selectedRole?.id === role.id ? 'border-blue-500 bg-blue-50' : ''
-              }`}
-              onClick={() => setSelectedRole(role)}
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <p className="font-semibold">{role.name}</p>
-                  <p className="mt-1 text-sm text-gray-600">{role.description}</p>
-                  <p className="mt-2 text-xs text-gray-500">
-                    {rolePermissions[role.id]?.length || 0} quyền
+        <div className="grid grid-cols-12 gap-6">
+          {/* Role List - Sidebar */}
+          <div className="col-span-4">
+            <div className="rounded-lg bg-white shadow">
+              <div className="border-b border-gray-200 p-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-gray-900">Danh Sách Vai Trò</h2>
+                  <CustomButton color="add" size="small">
+                    <Plus size={16} />
+                  </CustomButton>
+                </div>
+              </div>
+
+              <div className="divide-y">
+                {roles.map((role) => (
+                  <div
+                    key={role.id}
+                    className={`cursor-pointer p-4 transition-colors hover:bg-gray-50 ${
+                      selectedRole?.id === role.id ? 'border-l-4 border-blue-500 bg-blue-50' : ''
+                    }`}
+                    onClick={() => setSelectedRole(role)}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <Shield
+                            size={18}
+                            className={
+                              selectedRole?.id === role.id ? 'text-blue-600' : 'text-gray-400'
+                            }
+                          />
+                          <h3 className="font-semibold text-gray-900">{role.name}</h3>
+                        </div>
+                        <p className="mt-1 text-sm text-gray-600">{role.description}</p>
+                        <div className="mt-2 flex items-center gap-2">
+                          <span className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">
+                            {rolePermissions[role.id]?.length || 0} quyền
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex gap-1">
+                        <CustomButton color="edit" variant="text">
+                          <Edit2 size={14} />
+                        </CustomButton>
+                        <CustomButton color="delete" variant="text">
+                          <Trash2 size={14} />
+                        </CustomButton>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {roles.length === 0 && (
+                  <div className="p-8 text-center text-gray-500">
+                    <Shield size={48} className="mx-auto mb-3 text-gray-300" />
+                    <p className="text-sm">Chưa có vai trò nào</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Permission Management - Main Content */}
+          <div className="col-span-8">
+            {selectedRole ? (
+              <div className="space-y-6">
+                {/* Role Info Card */}
+                <div className="rounded-lg border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 shadow">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3">
+                        <div className="rounded-full bg-blue-600 p-3">
+                          <Shield size={24} className="text-white" />
+                        </div>
+                        <div>
+                          <h2 className="text-2xl font-bold text-gray-900">{selectedRole.name}</h2>
+                          <p className="mt-1 text-gray-700">{selectedRole.description}</p>
+                        </div>
+                      </div>
+                      <div className="mt-4 flex gap-4">
+                        <div className="rounded-lg bg-white px-4 py-2 shadow-sm">
+                          <p className="text-xs text-gray-600">Tổng quyền</p>
+                          <p className="text-xl font-bold text-blue-600">
+                            {rolePermissions[selectedRole.id]?.length || 0}
+                          </p>
+                        </div>
+                        <div className="rounded-lg bg-white px-4 py-2 shadow-sm">
+                          <p className="text-xs text-gray-600">Người dùng</p>
+                          <p className="text-xl font-bold text-green-600">0</p>
+                        </div>
+                      </div>
+                    </div>
+                    <CustomButton color="save" icon={<SaveOutlined />}>
+                      Lưu Thay Đổi
+                    </CustomButton>
+                  </div>
+                </div>
+
+                {/* Permissions Grid */}
+                <div className="grid grid-cols-2 gap-4">
+                  {Object.entries(grouped).map(([category, perms]) => (
+                    <div key={category} className="rounded-lg bg-white p-6 shadow">
+                      <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-900">
+                        <div className="h-1 w-1 rounded-full bg-blue-600"></div>
+                        {category}
+                      </h3>
+                      <div className="space-y-2">
+                        {perms.map((perm) => {
+                          const isAssigned = rolePermissions[selectedRole.id]?.includes(perm.id);
+                          return (
+                            <label
+                              key={perm.id}
+                              className="flex cursor-pointer items-start gap-3 rounded-lg p-3 transition-colors hover:bg-gray-50"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isAssigned}
+                                onChange={() => togglePermission(selectedRole.id, perm.id)}
+                                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                              />
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-gray-900">{perm.name}</p>
+                                <p className="text-xs text-gray-500">{perm.id}</p>
+                              </div>
+                              {isAssigned && (
+                                <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                                  Đã gán
+                                </span>
+                              )}
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="flex h-full min-h-[600px] items-center justify-center rounded-lg bg-white shadow">
+                <div className="text-center">
+                  <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+                    <Shield size={40} className="text-gray-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900">Chọn một vai trò</h3>
+                  <p className="mt-2 text-gray-600">
+                    Chọn vai trò từ danh sách bên trái để phân quyền
                   </p>
                 </div>
-                <div className="flex gap-1">
-                  <button className="rounded p-1 text-blue-600 hover:bg-blue-50">
-                    <Edit2 size={14} />
-                  </button>
-                  <button className="rounded p-1 text-red-600 hover:bg-red-50">
-                    <Trash2 size={14} />
-                  </button>
-                </div>
               </div>
-            </div>
-          ))}
+            )}
+          </div>
         </div>
       </div>
-
-      {/* Permission Assignment */}
-      {selectedRole ? (
-        <div className="rounded-lg bg-white p-6 shadow">
-          <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
-            <p className="text-sm text-gray-600">Đang phân quyền cho vai trò:</p>
-            <p className="text-lg font-semibold text-gray-900">{selectedRole.name}</p>
-            <p className="mt-1 text-sm text-gray-600">{selectedRole.description}</p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-6">
-            {/* System Permissions List */}
-            <div>
-              <h3 className="mb-3 font-semibold text-gray-800">Danh Sách Quyền Hệ Thống</h3>
-              <div className="max-h-96 overflow-y-auto rounded-lg border p-4">
-                {Object.entries(grouped).map(([category, perms]) => (
-                  <div key={category} className="mb-4">
-                    <h4 className="mb-2 rounded bg-gray-100 px-2 py-1 text-sm font-semibold text-gray-700">
-                      {category}
-                    </h4>
-                    {perms.map((perm) => (
-                      <div
-                        key={perm.id}
-                        className="flex items-center gap-2 px-2 py-2 text-sm text-gray-700"
-                      >
-                        <Shield size={14} className="text-gray-400" />
-                        <span>{perm.name}</span>
-                        <span className="text-xs text-gray-400">({perm.id})</span>
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Assigned Permissions */}
-            <div>
-              <div className="mb-3 flex items-center justify-between">
-                <h3 className="font-semibold text-gray-800">Quyền Đã Gán</h3>
-                <CustomButton color="save" icon={<SaveOutlined />}>
-                  Lưu
-                </CustomButton>
-              </div>
-              <div className="max-h-96 overflow-y-auto rounded-lg border p-4">
-                {Object.entries(grouped).map(([category, perms]) => (
-                  <div key={category} className="mb-4">
-                    <h4 className="mb-2 rounded bg-gray-100 px-2 py-1 text-sm font-semibold text-gray-700">
-                      {category}
-                    </h4>
-                    {perms.map((perm) => {
-                      const isAssigned = rolePermissions[selectedRole.id]?.includes(perm.id);
-                      return (
-                        <label
-                          key={perm.id}
-                          className="flex cursor-pointer items-center gap-2 rounded px-2 py-2 hover:bg-gray-50"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isAssigned}
-                            onChange={() => togglePermission(selectedRole.id, perm.id)}
-                            className="h-4 w-4"
-                          />
-                          <span className="text-sm text-gray-700">{perm.name}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="rounded-lg bg-white p-6 shadow">
-          <div className="py-12 text-center text-gray-500">
-            <Shield size={48} className="mx-auto mb-3 text-gray-300" />
-            <p>Chọn một vai trò để phân quyền</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

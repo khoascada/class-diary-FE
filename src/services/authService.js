@@ -15,23 +15,19 @@ class AuthService extends BaseService {
   logout = async () => this.post('/logout');
 
   // Refresh token
-  refreshToken = async (refreshToken) => 
-    this.post('/refresh', { refreshToken });
+  refreshToken = async (refreshToken) => this.post('/refresh', { refreshToken });
 
   // Forgot password
-  forgotPassword = async (email) => 
-    this.post('/forgot-password', { email });
+  forgotPassword = async (email) => this.post('/forgot-password', { email });
 
   // Reset password
-  resetPassword = async (token, password) => 
-    this.post('/reset-password', { token, password });
+  resetPassword = async (token, password) => this.post('/reset-password', { token, password });
 
   // Verify email
-  verifyEmail = async (token) => 
-    this.post('/verify-email', { token });
+  verifyEmail = async (token) => this.post('/verify-email', { token });
 
   // Change password
-  changePassword = async (currentPassword, newPassword) => 
+  changePassword = async (currentPassword, newPassword) =>
     this.put('/change-password', { currentPassword, newPassword });
 
   // Check email availability
