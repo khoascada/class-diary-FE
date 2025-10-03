@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Users, UserCheck, UserX, CalendarDays, Clock, AlertTriangle } from 'lucide-react';
 import { formatters } from '@/lib/utils/format';
 import { Tag } from 'antd';
-import CustomButton from '@/components/button/CustomButton';
+import CustomButton from '@/components/antd/button/CustomButton';
 export default function Home() {
   const [time, setTime] = useState(new Date());
 

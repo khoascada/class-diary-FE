@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { App } from 'antd';
 import { ChevronRight, ChevronDown, Edit2, Trash2, Search, Building2 } from 'lucide-react';
 import { PlusOutlined } from '@ant-design/icons';
-import CustomButton from '@/components/button/CustomButton';
+import CustomButton from '@/components/antd/button/CustomButton';
 import { useFetchService } from '@/hooks/useFetch';
 import departmentService from '@/services/departmentService';
 import ModalAddDepartment from './ModalAddDepartment';
@@ -20,12 +20,7 @@ export default function DepartmentsPage() {
   );
 
   const [selectedIdDepartment, setSelectedIdDepartment] = useState(null);
-  const { data: selectedDepartment, refetch: refetchSelectedDepartment } = useFetchService(
-    () => departmentService.getInfoDepartment(selectedIdDepartment),
-    [selectedIdDepartment],
-    {}
-  );
-
+  const [selectedDepartment, setSelectedDepartment] = useState({});
   const [expandedDepts, setExpandedDepts] = useState({});
   const [showDeptModal, setShowDeptModal] = useState(false);
   const [showEditDeptModal, setShowEditDeptModal] = useState(false);
@@ -164,6 +159,21 @@ export default function DepartmentsPage() {
     },
   ];
 
+  const fetchInfoDepartment = async () => {
+    try {
+      const response = await departmentService.getInfoDepartment(selectedIdDepartment);
+      setSelectedDepartment(response);
+    } catch (err) {
+      console.error('error when fetch info department', err);
+    }
+  };
+
+  useEffect(() => {
+    if (!selectedIdDepartment) return;
+
+    fetchInfoDepartment();
+  }, [selectedIdDepartment]);
+
   return (
     <div className="flex flex-col gap-6 p-6">
       {/* Department List */}
@@ -239,7 +249,7 @@ export default function DepartmentsPage() {
         departmentInit={selectedDepartment}
         setVisible={setShowEditDeptModal}
         fetchDepartment={reFetchDepartments}
-        refetchSelectedDepartment={refetchSelectedDepartment}
+        refetchSelectedDepartment={fetchInfoDepartment}
       />
     </div>
   );

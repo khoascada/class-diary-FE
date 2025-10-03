@@ -1,0 +1,23 @@
+.checkbox :global(.ant-checkbox) {
+  border-radius: 4px;
+}
+
+.checkbox :global(.ant-checkbox-checked .ant-checkbox-inner) {
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+.checkbox :global(.ant-checkbox-inner) {
+  width: 18px;
+  height: 18px;
+  border-width: 2px;
+}
+
+.large :global(.ant-checkbox-inner) {
+  width: 20px;
+  height: 20px;
+}
+
+.checkbox :global(.ant-checkbox-wrapper:hover .ant-checkbox-inner) {
+  border-color: #1890ff;
+}

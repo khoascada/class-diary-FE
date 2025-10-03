@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Search, Users, Shield, Save, UserCircle, Mail, Building2, Award } from 'lucide-react';
 import { SaveOutlined } from '@ant-design/icons';
-import CustomButton from '@/components/button/CustomButton';
+import CustomButton from '@/components/antd/button/CustomButton';
 import { useFetchService } from '@/hooks/useFetch';
 import departmentService from '@/services/departmentService';
 import roleService from '@/services/roleService';

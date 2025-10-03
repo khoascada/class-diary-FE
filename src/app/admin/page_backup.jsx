@@ -13,7 +13,7 @@ import {
   Save,
   LogOut,
 } from 'lucide-react';
-import CustomButton from '@/components/button/CustomButton';
+import CustomButton from '@/components/antd/button/CustomButton';
 import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { useFetchService } from '@/hooks/useFetch';
 import ModalAddDepartment from './departments/ModalAddDepartment';
