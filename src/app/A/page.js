@@ -13,12 +13,21 @@ export default function Home() {
   ));
 
   return (
-    <div className="flex min-h-screen flex-col items-center p-4">
-      <h1 className="mb-8 text-3xl font-bold text-gray-800">
-        Trang chủ - Cuộn xuống để xem nội dung
-      </h1>
+    <div>
+      <div class="flex w-[200px] gap-2 mb-4">
+  <div class="shrink-0 w-[80px] bg-blue-500">Fixed</div>
+  <div class="truncate bg-red-500">
+    Đây là một đoạn văn bản rất dài sẽ KHÔNG bị cắt
+  </div>
+</div>
 
-      {dummyContent}
+
+<div class="flex w-[200px] gap-2">
+  <div class="shrink-0 w-[80px] bg-blue-500">Fixed</div>
+  <div class="min-w-0 truncate bg-red-500">
+    Đây là một đoạn văn bản rất dài sẽ bị cắt
+  </div>
+</div>
     </div>
   );
 }

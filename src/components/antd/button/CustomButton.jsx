@@ -54,6 +54,15 @@ export default function CustomButton({
           color: baseColor,
           ...style,
         };
+      case 'dashed':
+        return {
+          '--btn-color': baseColor,
+          backgroundColor: 'transparent',
+          borderColor: baseColor,
+          borderStyle: 'dashed',
+          color: baseColor,
+          ...style,
+        };
 
       default:
         return style;

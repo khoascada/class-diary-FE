@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { List, Space, Typography, Tag, Empty, Row, Col, Card, Checkbox } from 'antd';
+import { List, Space, Typography, Tag, Empty, Card, Checkbox } from 'antd';
 import { Shield, Edit2, Trash2, Plus, Save, Users } from 'lucide-react';
 import { useFetchService } from '@/hooks/useFetch';
 import roleService from '@/services/roleService';
@@ -51,7 +51,7 @@ export default function RolesPage() {
 
   return (
     <div className="p-6">
-      <div className="mx-auto max-w-[1400px]">
+      <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-6">
           <Title level={2} className="!m-0 flex items-center">
@@ -153,7 +153,7 @@ export default function RolesPage() {
                   </Text>
                 }
                 bodyStyle={{ padding: 4 }}
-                className="h-full"
+                className="h-full "
               >
                 {permissions.length > 0 ? (
                   <div className="grid grid-cols-2 gap-2">

@@ -15,6 +15,11 @@
   color: #ffffff !important;
 }
 
+.dashed:hover {
+  background-color: var(--btn-color);
+  border-style: solid !important;
+}
+
 /* Text variant hover */
 .text:hover {
   background-color: rgba(0, 0, 0, 0.05) !important;

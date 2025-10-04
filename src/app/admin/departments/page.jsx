@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { App } from 'antd';
-import { ChevronRight, ChevronDown, Edit2, Trash2, Search, Building2 } from 'lucide-react';
+import { ChevronRight, ChevronDown, Edit2, Trash2, Search, Building2, Plus } from 'lucide-react';
 import { PlusOutlined } from '@ant-design/icons';
 import CustomButton from '@/components/antd/button/CustomButton';
 import { useFetchService } from '@/hooks/useFetch';
@@ -10,6 +10,7 @@ import departmentService from '@/services/departmentService';
 import ModalAddDepartment from './ModalAddDepartment';
 import ModalEditDepartment from './ModalEditDepartment';
 import { Table } from 'antd';
+import ModalAddMemberToDepartment from './ModalAddMemberToDepartment';
 export default function DepartmentsPage() {
   const { modal, message } = App.useApp();
 
@@ -24,6 +25,7 @@ export default function DepartmentsPage() {
   const [expandedDepts, setExpandedDepts] = useState({});
   const [showDeptModal, setShowDeptModal] = useState(false);
   const [showEditDeptModal, setShowEditDeptModal] = useState(false);
+  const [showAddMember, setShowAddMember] = useState(false);
 
   // Mock users data - TODO: Replace with API
   const users = [
@@ -175,15 +177,15 @@ export default function DepartmentsPage() {
   }, [selectedIdDepartment]);
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="mx-auto flex max-w-7xl flex-col gap-6 p-6">
       {/* Department List */}
-      <div>
+      <div className="">
         <div className="mb-4 flex items-center justify-between">
           <CustomButton color="add" icon={<PlusOutlined />} onClick={() => setShowDeptModal(true)}>
             Tạo Phòng ban
           </CustomButton>
         </div>
-        <div className="max-h-96 overflow-y-auto rounded-xl bg-white p-3 shadow-md">
+        <div className="max-h-96 overflow-y-auto rounded-xl border border-slate-200 bg-white p-3 shadow-md shadow-sm">
           {departments
             .filter((d) => !d.parent)
             .map((dept) => (
@@ -219,7 +221,12 @@ export default function DepartmentsPage() {
             </div>
 
             <div>
-              <h4 className="mb-3 font-semibold text-gray-800">Nhân Viên Thuộc Phòng Ban</h4>
+              <div className="flex justify-between">
+                <h4 className="mb-3 font-semibold text-gray-800">Nhân Viên Thuộc Phòng Ban</h4>
+                <CustomButton color="add" onClick={() => setShowAddMember(true)}>
+                  <Plus size={14} />
+                </CustomButton>
+              </div>
               <Table
                 dataSource={usersTable}
                 columns={columns}
@@ -250,6 +257,12 @@ export default function DepartmentsPage() {
         setVisible={setShowEditDeptModal}
         fetchDepartment={reFetchDepartments}
         refetchSelectedDepartment={fetchInfoDepartment}
+      />
+      <ModalAddMemberToDepartment
+        visible={showAddMember}
+        departments={departments}
+        setVisible={setShowAddMember}
+        fetchDepartment={reFetchDepartments}
       />
     </div>
   );

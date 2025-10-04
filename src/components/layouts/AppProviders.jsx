@@ -36,12 +36,6 @@ function LayoutWrapper({ children }) {
       <main className="flex-1 overflow-y-auto">
         <div className="mx-16 my-4 min-h-[calc(100vh-8rem)]">{children}</div>
       </main>
-
-      {/* Footer */}
-      {/* <footer className="mt-8 flex w-full justify-between px-8 py-4 text-center text-sm text-gray-600 shadow-md">
-        <span>Hi im your</span>
-        <span>Design by: Khoa</span>
-      </footer> */}
     </div>
   );
 }
@@ -57,6 +51,7 @@ export default function AppProviders({ children }) {
               borderRadius: 8,
               colorTextBase: '#171717',
               colorBgBase: '#fff',
+              fontSize: 14,
             },
           }}
         >

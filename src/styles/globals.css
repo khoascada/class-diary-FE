@@ -16,6 +16,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* thay đổi 1rem =14px */
+  font-size: 14px; 
 }
 
 @theme inline {

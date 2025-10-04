@@ -34,7 +34,7 @@ export default function Home() {
     },
   ];
   return (
-    <div className="mx-auto flex w-full max-w-[1400px] flex-col items-center gap-8">
+    <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-8">
       {/* 1 */}
       <div className="grid w-full grid-cols-1 gap-6 2xl:grid-cols-3">
         <div className="2xl:col-span-2">

@@ -19,7 +19,7 @@ const AppHeader = () => {
   const adminMenu = [
     { title: 'Phòng ban', path: '/admin/departments' },
     { title: 'Vai trò', path: '/admin/roles' },
-    { title: 'Người dùng', path: '/admin/users' },
+    // { title: 'Người dùng', path: '/admin/users' },
   ];
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);

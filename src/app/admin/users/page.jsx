@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
+import { List, Space, Typography, Tag, Empty, Card, Checkbox } from 'antd';
 import { Search, Users, Shield, Save, UserCircle, Mail, Building2, Award } from 'lucide-react';
 import { SaveOutlined } from '@ant-design/icons';
 import CustomButton from '@/components/antd/button/CustomButton';
 import { useFetchService } from '@/hooks/useFetch';
 import departmentService from '@/services/departmentService';
 import roleService from '@/services/roleService';
-
+import CustomTag from '@/components/antd/tag/CustomTag';
 export default function UsersPage() {
   const { data: departments = [], refetch: reFetchDepartments } = useFetchService(
     departmentService.getListDepartment,
@@ -33,8 +34,16 @@ export default function UsersPage() {
       id: 1,
       name: 'Nguyễn Văn An',
       email: 'nva@school.edu.vn',
-      department: 1,
-      role: 1,
+      role_department: [
+        {
+          role: 1,
+          department: 1,
+        },
+        {
+          role: 2,
+          department: 3,
+        },
+      ],
       avatar: null,
       phone: '0123456789',
       status: 'active',
@@ -43,8 +52,12 @@ export default function UsersPage() {
       id: 2,
       name: 'Trần Thị Bích',
       email: 'ttb@school.edu.vn',
-      department: 2,
-      role: 2,
+      role_department: [
+        {
+          role: 2,
+          department: 2,
+        },
+      ],
       avatar: null,
       phone: '0987654321',
       status: 'active',
@@ -53,8 +66,12 @@ export default function UsersPage() {
       id: 3,
       name: 'Lê Văn Cường',
       email: 'lvc@school.edu.vn',
-      department: 2,
-      role: 3,
+      role_department: [
+        {
+          role: 3,
+          department: 2,
+        },
+      ],
       avatar: null,
       phone: '0912345678',
       status: 'active',
@@ -63,8 +80,12 @@ export default function UsersPage() {
       id: 4,
       name: 'Phạm Thị Dung',
       email: 'ptd@school.edu.vn',
-      department: 3,
-      role: 4,
+      role_department: [
+        {
+          role: 4,
+          department: 3,
+        },
+      ],
       avatar: null,
       phone: '0345678901',
       status: 'inactive',
@@ -73,8 +94,12 @@ export default function UsersPage() {
       id: 5,
       name: 'Hoàng Văn Em',
       email: 'hve@school.edu.vn',
-      department: 3,
-      role: 5,
+      role_department: [
+        {
+          role: 5,
+          department: 3,
+        },
+      ],
       avatar: null,
       phone: '0567890123',
       status: 'active',
@@ -118,93 +143,82 @@ export default function UsersPage() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Quản Lý Người Dùng</h1>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-sm text-gray-600">
             Gán vai trò và phòng ban cho người dùng trong hệ thống
           </p>
         </div>
 
-        <div className="grid grid-cols-12 gap-6">
+        <div className="grid grid-cols-5 gap-6">
           {/* User List */}
-          <div className="col-span-5">
-            <div className="rounded-lg bg-white shadow">
-              <div className="border-b border-gray-200 p-4">
-                <h2 className="mb-4 text-lg font-semibold text-gray-900">Danh Sách Người Dùng</h2>
-                <div className="relative">
-                  <Search size={16} className="absolute top-3 left-3 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Tìm theo tên hoặc email..."
-                    className="w-full rounded-lg py-2 pr-4 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                    value={searchUser}
-                    onChange={(e) => setSearchUser(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="max-h-[calc(100vh-280px)] divide-y overflow-y-auto">
-                {users
-                  .filter(
-                    (u) =>
-                      u.name.toLowerCase().includes(searchUser.toLowerCase()) ||
-                      u.email.toLowerCase().includes(searchUser.toLowerCase())
-                  )
-                  .map((user) => (
-                    <div
-                      key={user.id}
-                      className={`cursor-pointer p-4 transition-colors hover:bg-gray-50 ${
-                        selectedUser?.id === user.id ? 'border-l-4 border-blue-500 bg-blue-50' : ''
-                      }`}
-                      onClick={() => setSelectedUser(user)}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 font-semibold text-white">
-                          {getInitials(user.name)}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <p className="truncate font-semibold text-gray-900">{user.name}</p>
-                            {user.status === 'active' ? (
-                              <span className="h-2 w-2 rounded-full bg-green-500"></span>
-                            ) : (
-                              <span className="h-2 w-2 rounded-full bg-gray-400"></span>
-                            )}
-                          </div>
-                          <p className="truncate text-sm text-gray-600">{user.email}</p>
-                          <div className="mt-2 flex flex-wrap gap-2">
-                            <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700">
-                              <Building2 size={12} />
-                              {getDepartmentById(user.department)?.name || 'N/A'}
-                            </span>
-                            <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-800">
-                              <Award size={12} />
-                              {getRoleById(user.role)?.name || 'N/A'}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                {users.filter(
+          <div className="col-span-2 max-h-[700px] overflow-y-auto rounded-lg bg-white shadow">
+            <h2 className="p-4 text-lg font-semibold text-gray-900">Danh Sách Người Dùng</h2>
+            <div className="relative sticky top-0 z-10 border-b border-gray-200 bg-white p-4">
+              <Search size={16} className="absolute top-6.5 left-7 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Tìm theo tên hoặc email..."
+                className="w-full rounded-lg py-2 pr-4 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+                value={searchUser}
+                onChange={(e) => setSearchUser(e.target.value)}
+              />
+            </div>
+            <div className="">
+              <List
+                dataSource={users.filter(
                   (u) =>
                     u.name.toLowerCase().includes(searchUser.toLowerCase()) ||
                     u.email.toLowerCase().includes(searchUser.toLowerCase())
-                ).length === 0 && (
-                  <div className="p-8 text-center text-gray-500">
-                    <Search size={48} className="mx-auto mb-3 text-gray-300" />
-                    <p className="text-sm">Không tìm thấy người dùng</p>
-                  </div>
                 )}
-              </div>
+                locale={{
+                  emptyText: (
+                    <div className="p-8 text-center text-gray-500">
+                      <Search size={48} className="mx-auto mb-3 text-gray-300" />
+                      <p className="text-sm">Không tìm thấy người dùng</p>
+                    </div>
+                  ),
+                }}
+                renderItem={(user) => (
+                  <List.Item
+                    key={user.id}
+                    onClick={() => setSelectedUser(user)}
+                    className={`cursor-pointer transition-colors hover:bg-gray-100 ${
+                      selectedUser?.id === user.id ? 'border-l-4 border-blue-500 bg-blue-100' : ''
+                    }`}
+                  >
+                    <div className="flex w-full items-start gap-3">
+                      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 font-semibold text-white">
+                        {getInitials(user.name)}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="truncate font-semibold text-gray-900">{user.name}</p>
+                        </div>
+                        <p className="truncate text-sm text-gray-600">{user.email}</p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {user.role_department.map((rd, index) => (
+                            <div key={index} className="flex flex-wrap">
+                              <CustomTag color="blue">
+                                {getDepartmentById(rd.department)?.name}
+                              </CustomTag>
+                              <CustomTag color="orange">{getRoleById(rd.role)?.name}</CustomTag>
+                              {index !== user.role_department.length - 1 ? '|' : ''}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </List.Item>
+                )}
+              />
             </div>
           </div>
 
           {/* User Detail & Role Assignment */}
-          <div className="col-span-7">
+          <div className="col-span-3 h-full">
             {selectedUser ? (
-              <div className="space-y-6">
+              <div className="space-y-4 rounded-lg bg-white p-6 shadow">
                 {/* User Info Card */}
-                <div className="rounded-lg bg-white p-6 shadow">
+                <div className="border-b border-[#B6BABD] pb-2">
                   <div className="flex items-start gap-4">
                     <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-2xl font-bold text-white">
                       {getInitials(selectedUser.name)}
@@ -224,22 +238,13 @@ export default function UsersPage() {
                             </div>
                           </div>
                         </div>
-                        <span
-                          className={`rounded-full px-3 py-1 text-xs font-medium ${
-                            selectedUser.status === 'active'
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-gray-100 text-gray-700'
-                          }`}
-                        >
-                          {selectedUser.status === 'active' ? 'Đang hoạt động' : 'Không hoạt động'}
-                        </span>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Assignment Form */}
-                <div className="rounded-lg bg-white p-6 shadow">
+                <div className="">
                   <div className="mb-4 flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-gray-900">Phân Quyền</h3>
                     <CustomButton color="save" icon={<SaveOutlined />}>
