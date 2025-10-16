@@ -14,28 +14,14 @@ authListenerMiddleware.startListening({
   actionCreator: loginUser.fulfilled,
   // function đc gọi khi action xảy ra (ở đây là login thành công)
   effect: async (action, listenerApi) => {
-    const { user, accessToken, refreshToken } = action.payload;
+    const { user } = action.payload;
 
-    // Auto-refresh token before expiry (15 minutes before expiry)
-    const tokenExpiry = parseJWT(accessToken)?.exp;
-    if (tokenExpiry) {
-      const refreshTime = tokenExpiry * 1000 - Date.now() - 15 * 60 * 1000;
-      if (refreshTime > 0) {
-        setTimeout(() => {
-          listenerApi.dispatch(refreshToken());
-        }, refreshTime);
-      }
-    }
+
     // Redirect based on user role or return URL
     const hasAdminRole = user.department_roles?.some((role) => role.role_name === ROLE.ADMIN);
-    const returnUrl = sessionStorage.getItem('returnUrl');
-    if (returnUrl) {
-      sessionStorage.removeItem('returnUrl');
-      window.location.href = returnUrl;
-    } else {
       const defaultRoute = hasAdminRole ? '/admin/departments' : '/home';
       window.location.href = defaultRoute;
-    }
+    
   },
 });
 
@@ -64,25 +50,7 @@ authListenerMiddleware.startListening({
   },
 });
 
-// Listen for token refresh success
-authListenerMiddleware.startListening({
-  actionCreator: refreshToken.fulfilled,
-  effect: async (action, listenerApi) => {
-    const { accessToken } = action.payload;
-    console.log('🔄 Token refreshed successfully');
 
-    // Schedule next refresh
-    const tokenExpiry = parseJWT(accessToken)?.exp;
-    if (tokenExpiry) {
-      const refreshTime = tokenExpiry * 1000 - Date.now() - 15 * 60 * 1000;
-      if (refreshTime > 0) {
-        setTimeout(() => {
-          listenerApi.dispatch(refreshToken());
-        }, refreshTime);
-      }
-    }
-  },
-});
 
 // Listen for auth errors
 authListenerMiddleware.startListening({
@@ -112,20 +80,3 @@ authListenerMiddleware.startListening({
     }
   },
 });
-
-// Utility function to parse JWT
-const parseJWT = (token) => {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch (error) {
-    return null;
-  }
-};

@@ -29,8 +29,6 @@ export default function RolesPage() {
     { id: 3, name: 'Trưởng Khối', description: 'Quản lý khối/tổ chuyên môn', users: 8 },
     { id: 4, name: 'Giáo Viên Chủ Nhiệm', description: 'Phụ trách lớp học', users: 25 },
     { id: 5, name: 'Giáo Viên Bộ Môn', description: 'Giảng dạy môn học', users: 45 },
-    { id: 5, name: 'Giáo Viên Bộ Môn', description: 'Giảng dạy môn học', users: 45 },
-    { id: 5, name: 'Giáo Viên Bộ Môn', description: 'Giảng dạy môn học', users: 45 },
   ]);
 
   const [selectedRole, setSelectedRole] = useState(null);

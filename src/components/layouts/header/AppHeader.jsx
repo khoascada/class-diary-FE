@@ -3,13 +3,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { logoutUser } from '@/lib/store/slices/authSlice';
+import { logoutUser, selectRoleDep } from '@/lib/store/slices/authSlice';
 import UserInfoModal from './UserInfoModal';
 import { useAuth } from '@/lib/providers/AuthProvider';
+import { Select } from 'antd';
 const AppHeader = () => {
   const pathname = usePathname();
   const { isAdminRoute } = useAuth();
   const userInfo = useSelector((state) => state.auth.user);
+  const {  department_roles,department_role_select} = userInfo;
+  const idRole = department_role_select?.id
   const dispatch = useDispatch();
   const listMenu = [
     { title: 'Trang chủ', path: '/home' },
@@ -23,6 +26,7 @@ const AppHeader = () => {
   ];
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [selectedDepRoleId, setSelectedRoleId] = useState(null);
   const dropdownRef = useRef(null);
 
   // Function xử lý thông tin user
@@ -47,9 +51,10 @@ const AppHeader = () => {
   const handleLogout = () => {
     dispatch(logoutUser());
   };
+
   return (
     <>
-      <header className="sticky top-0 z-50 flex h-16 items-center justify-between bg-white px-6 shadow-md">
+      <header className="sticky top-0 z-50 flex gap-4 h-16 items-center justify-between bg-white px-6 shadow-md">
         {/* Menu giữa */}
         <nav className="flex flex-1 items-center justify-center">
           <ul className="flex gap-8">
@@ -68,6 +73,22 @@ const AppHeader = () => {
             })}
           </ul>
         </nav>
+
+        <Select
+          value={idRole}
+          onChange={(value) => dispatch(selectRoleDep({ id: value }))}
+          options={department_roles?.map((depRole) => ({
+            value: depRole.id,
+            label: (
+              <div className="flex items-center gap-1 text-sm">
+                <span className="font-semibold text-gray-800">{depRole.role_name}</span>
+                <span className="text-gray-400">•</span>
+                <span className="text-gray-500">{depRole.department_name}</span>
+              </div>
+            ),
+          }))}
+          className="min-w-[250px]"
+        />
 
         {/* User Avatar Dropdown */}
         <div className="relative" ref={dropdownRef}>

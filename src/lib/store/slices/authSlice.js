@@ -17,7 +17,13 @@ export const loginUser = createAsyncThunk(
       sessionStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
 
-      return { user, accessToken, refreshToken };
+      const updateUser = {
+        ...user,
+        department_role_select: user?.department_roles?.[0] || null
+      
+      }
+
+      return { user: updateUser, accessToken, refreshToken };
     } catch (error) {
       const errMsg = error.response?.data?.message || 'Login failed';
 
@@ -101,6 +107,10 @@ const authSlice = createSlice({
       state.accessToken = accessToken;
       if (refreshToken) state.refreshToken = refreshToken;
     },
+    selectRoleDep: (state, action) => {
+      const {id} = action.payload
+      state.user.department_role_select = state.user.department_roles.find(depRole => depRole.id === id)
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -134,5 +144,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, initializeAuth, updateTokens } = authSlice.actions;
+export const { clearError, initializeAuth, updateTokens, selectRoleDep } = authSlice.actions;
 export default authSlice.reducer;
